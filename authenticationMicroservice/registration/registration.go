@@ -184,3 +184,88 @@ func sendEmail(to, code string) error {
 	log.Println("Email sent successfully.")
 	return nil
 }
+
+// RegisterUser handles user registration by verifying the code and updating the table.
+func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling /register-user request...")
+
+	// Parse the incoming request
+	var registration struct {
+		Email          string `json:"email"`
+		VerificationCode string `json:"verification_code"`
+		Name           string `json:"name"`
+		Password       string `json:"password"`
+		ContactNumber  string `json:"contact_number"`
+		Address        string `json:"address"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&registration)
+	if err != nil {
+		log.Printf("Error parsing request body: %v", err)
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+	log.Printf("Parsed request: %+v", registration)
+
+	// Verify the provided verification code and timestamp
+	var dbVerificationCode string
+	var dbCreatedAt string // Use string to avoid the scanning error
+
+	log.Println("Checking verification code in the database...")
+	err = db.QueryRow(
+		"SELECT verification_code, created_at FROM registration WHERE email = ?",
+		registration.Email,
+	).Scan(&dbVerificationCode, &dbCreatedAt)
+	if err == sql.ErrNoRows {
+		log.Println("Email not found.")
+		http.Error(w, "Email not found or verification code invalid", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.Printf("Database error: %v", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Database values: verification_code=%s, created_at=%s", dbVerificationCode, dbCreatedAt)
+
+	// Convert dbCreatedAt from string to time.Time
+	createdAt, err := time.Parse("2006-01-02 15:04:05", dbCreatedAt)
+	if err != nil {
+		log.Printf("Error parsing created_at timestamp: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if the verification code matches
+	if dbVerificationCode != registration.VerificationCode {
+		log.Println("Verification code mismatch.")
+		http.Error(w, "Invalid verification code", http.StatusUnauthorized)
+		return
+	}
+
+	// Check if the code is still valid (within 10 minutes)
+	if time.Since(createdAt) > 10*time.Minute {
+		log.Println("Verification code expired.")
+		http.Error(w, "Verification code expired", http.StatusUnauthorized)
+		return
+	}
+
+	// Debug the values being passed to the update query
+	log.Printf("Updating user details: name=%s, password=%s, contact_number=%s, address=%s, email=%s",
+		registration.Name, registration.Password, registration.ContactNumber, registration.Address, registration.Email)
+
+	// Update the user details in the database
+	_, err = db.Exec(`
+		UPDATE registration
+		SET name = ?, password = ?, contact_number = ?, address = ?
+		WHERE email = ?`,
+		registration.Name, registration.Password, registration.ContactNumber, registration.Address, registration.Email)
+	if err != nil {
+		log.Printf("Error updating database: %v", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("User registration successful.")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "User registered successfully"}`))
+}

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check if the email is valid
     if (!validateEmail(email)) {
-      alert("Please enter a valid email address.");
+      showCustomAlert("Please enter a valid email address.");
       return;
     }
 
@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        alert(data.message || "Verification code sent successfully!");
+        showCustomAlert(data.message || "Verification code sent successfully!");
       })
       .catch((error) => {
-        alert(
+        showCustomAlert(
           error.message ||
             "An error occurred while sending the verification code."
         );
@@ -54,4 +54,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const verificationCode = document.getElementById("verificationCode").value;
+    const name =
+      document.getElementById("firstName").value +
+      " " +
+      document.getElementById("lastName").value;
+    const password = document.getElementById("password").value;
+    const contactNumber = document.getElementById("contactNumber").value;
+    const address = document.getElementById("address").value;
+
+    const response = await fetch(
+      "http://localhost:5000/api/v1/authentication/register-user",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          verification_code: verificationCode,
+          name,
+          password,
+          contact_number: contactNumber,
+          address,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      showCustomAlert(data.message, "login.html");
+    } else {
+      showCustomAlert(`Error: ${data.message || "Failed to register"}`);
+    }
+  });
 });

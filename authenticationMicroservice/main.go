@@ -15,6 +15,8 @@ func main() {
 
 	// Registration endpoints
 	router.HandleFunc("/api/v1/authentication/send-verification", registration.SendVerificationCode).Methods("POST")
+	router.HandleFunc("/api/v1/authentication/register-user", registration.RegisterUser).Methods("POST")
+
 
 	// Add CORS support
 	corsHandler := handlers.CORS(
