@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  background-color: #ffffff !important; /* White background for navbar */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow at the bottom */
+}
+
+/* Primary buttons with green colour scheme and bold text */
+.btn-primary {
+  background-color: rgb(25, 135, 84); /* Green background */
+  color: #ffffff; /* White text */
+  font-weight: bold; /* Bold text */
+  border: none; /* Remove borders */
+  padding: 10px 20px; /* Add padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.btn-primary:hover {
+  background-color: rgb(20, 108, 67); /* Slightly darker green on hover */
+}
+
+/* Headings (h1, h2, h3) with green colour scheme and bold text */
+h1,
+h2,
+h3 {
+  color: rgb(25, 135, 84); /* Green text colour */
+  font-weight: bold; /* Bold text */
+}
+
+/* Links (a) with green colour scheme and bold text */
+a {
+  color: rgb(25, 135, 84); /* Green text */
+  font-weight: bold; /* Bold text */
+  text-decoration: none !important; /* Remove underline */
+}
+
+a:hover {
+  color: rgb(20, 108, 67); /* Slightly darker green on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
