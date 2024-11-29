@@ -35,14 +35,14 @@
     <link rel="stylesheet" href="./css/style.css" />
 
     <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
-    <link rel="stylesheet" href="./css/signup.css" />
+    <!-- <link rel="stylesheet" href="./css/signup.css" /> -->
     <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
 
     <!-- Linking JS -->
     <script src="./js/script.js" defer></script>
 
     <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
-    <!-- <script src="./js/" defer></script> -->
+    <script src="./js/signup.js" defer></script>
     <!-- ######################################## END OF PAGE'S JS ########################################################### -->
 
     <!-- Add a favicon to the tab bar -->
@@ -111,6 +111,33 @@
                   required
                 />
               </div>
+
+              <!-- Contact Number -->
+              <div class="mb-3">
+                <label for="contactNumber" class="form-label"
+                  >Contact Number</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="contactNumber"
+                  placeholder="Enter your contact number"
+                  required
+                />
+              </div>
+
+              <!-- Address -->
+              <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address"
+                  placeholder="Enter your address"
+                  required
+                ></input>
+              </div>
+
               <!-- Email Input with Send Code Button -->
               <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
@@ -145,13 +172,6 @@
                     placeholder="Enter verification code"
                     required
                   />
-                  <button
-                    type="button"
-                    class="btn btn-outline-secondary"
-                    id="confirmCode"
-                  >
-                    Confirm
-                  </button>
                 </div>
               </div>
 
