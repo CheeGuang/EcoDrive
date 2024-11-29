@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="./css/style.css" />
 
     <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
-    <!-- <link rel="stylesheet" href="./css/" /> -->
+    <link rel="stylesheet" href="./css/memberHome.css" />
     <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
 
     <!-- Linking JS -->
@@ -69,34 +69,21 @@
           <div id="customAlertContainer"></div>
 
           <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
-          <h1 class="text-success">Welcome to EcoDrive</h1>
-          <p class="lead text-muted">
-            Driving towards a sustainable future with eco-friendly car rentals.
-          </p>
+          <!-- Welcome Message -->
+          <h1 class="welcome-message">
+            Welcome, <span id="memberName">Member Name</span>!
+          </h1>
+          <p class="mb-3">What would you like to do today?</p>
 
-          <main class="container my-5">
-            <div class="row">
-              <div class="col-md-4">
-                <img
-                  src="./img/art.jpg"
-                  alt="EcoDrive Art"
-                  class="img-fluid rounded shadow"
-                />
-              </div>
-              <div class="col-md-8 d-flex flex-column justify-content-center">
-                <p class="text-secondary">
-                  EcoDrive is committed to providing eco-friendly car rentals to
-                  reduce your carbon footprint. Explore our fleet of electric
-                  and hybrid vehicles, designed to meet your transportation
-                  needs while promoting sustainability. Join us in driving
-                  change for a greener tomorrow!
-                </p>
-                <a href="./login.html" class="btn btn-outline-success mt-3">
-                  <i class="fas fa-leaf"></i> Get Started
-                </a>
-              </div>
-            </div>
-          </main>
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="profileManagementButton">
+              <i class="fas fa-user-cog"></i> Profile Management
+            </button>
+            <button class="btn btn-success" id="bookVehicleButton">
+              <i class="fas fa-car"></i> Book Vehicle
+            </button>
+          </div>
           <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
         </div>
       </div>
