@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // API endpoint for login
-    const endpoint = "http://localhost:5000/api/v1/authentication/login";
+    const endpoint = "http://localhost:5050/api/v1/authentication/login";
 
     try {
       // Send a POST request to the login endpoint

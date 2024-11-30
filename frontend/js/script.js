@@ -1,4 +1,3 @@
-// navbarFooter.js
 document.addEventListener("DOMContentLoaded", () => {
   const loadComponent = (url, placeholderId) => {
     fetch(url)
@@ -14,8 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error loading component:", error));
   };
 
-  // Load Navbar
-  loadComponent("./navbar.html", "navbar-container");
+  // Check for token in localStorage and load the appropriate navbar
+  const token = localStorage.getItem("token");
+  const navbarUrl = token ? "./memberNavbar.html" : "./navbar.html";
+  loadComponent(navbarUrl, "navbar-container");
 
   // Load Footer
   loadComponent("./footer.html", "footer-container");

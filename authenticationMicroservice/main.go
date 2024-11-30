@@ -24,12 +24,12 @@ func main() {
 
 	// Add CORS support
 	corsHandler := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://127.0.0.1:5501"}), // Add allowed origins here
+		handlers.AllowedOrigins([]string{"http://127.0.0.1:5050"}), // Add allowed origins here
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}), // Add allowed HTTP methods
 		handlers.AllowedHeaders([]string{"Content-Type"}),           // Add allowed headers
 	)(router)
 
 	// Start the server
-	log.Println("Server is running on port 5000...")
-	log.Fatal(http.ListenAndServe(":5000", corsHandler))
+	log.Println("Server is running on port 5050...")
+	log.Fatal(http.ListenAndServe(":5050", corsHandler))
 }

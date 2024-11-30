@@ -14,7 +14,7 @@ USE ecoDrive_authentication_db;
 CREATE TABLE Authentication (
     auth_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for authentication record
     user_id INT NOT NULL,                             -- Associated user ID
-    auth_token VARCHAR(1000) NOT NULL UNIQUE,          -- Authentication token
+    auth_token VARCHAR(500) NOT NULL UNIQUE,          -- Authentication token
     token_expiry TIMESTAMP NOT NULL                   -- Expiry timestamp of the token
 );
 
@@ -37,36 +37,8 @@ CREATE TABLE User (
 );
 
 -- Insert example data into the User table
-INSERT INTO User (name, email, password, membership_level, contact_number, address, verification_code, created_at) VALUES
+INSERT INTO User (name, email, password, contact_number, address, verification_code, created_at) VALUES
 ("Alice Johnson", "alice.johnson@example.com", "hashed_password", "12345678", "123 Main St, Singapore", "123456", NOW());
-
-
--- **************************************************
--- DATABASE: ecoDrive_payment_db
--- PURPOSE: Tracks payment transactions for the 
---          Payment Service
--- **************************************************
-
--- Drop and recreate the payment database
-DROP DATABASE IF EXISTS ecoDrive_payment_db;
-CREATE DATABASE ecoDrive_payment_db;
-USE ecoDrive_payment_db;
-
--- Create the Payments table
--- PURPOSE: Records payment details and statuses
-CREATE TABLE Payments (
-    payment_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for payment
-    user_id INT NOT NULL,                                -- Associated user ID
-    booking_id INT NOT NULL,                             -- Booking reference ID
-    amount DECIMAL(10, 2) NOT NULL,                      -- Payment amount
-    payment_method ENUM('Card', 'PayNow'),               -- Payment method used
-    payment_status ENUM('Pending', 'Completed', 'Refunded'), -- Status of the payment
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP       -- Record creation timestamp
-);
-
--- Insert example data into the Payments table
-INSERT INTO Payments (user_id, booking_id, amount, payment_method, payment_status) VALUES
-(1, 101, 100.50, "Card", "Completed");
 
 
 -- **************************************************
@@ -113,7 +85,7 @@ USE ecoDrive_vehicle_db;
 -- PURPOSE: Stores vehicle details and rental information
 CREATE TABLE Vehicles (
     vehicle_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for the vehicle
-    vehicle_type ENUM('Car', 'Bike', 'EV') NOT NULL,     -- Type of vehicle
+    model VARCHAR(255) NOT NULL,                         -- Model of the vehicle
     availability_status ENUM('Available', 'Booked', 'Maintenance') NOT NULL, -- Availability status
     location VARCHAR(255),                               -- Current location of the vehicle
     charge_level INT,                                    -- Battery charge level (for EVs)
@@ -121,6 +93,55 @@ CREATE TABLE Vehicles (
     rental_price_per_hour DECIMAL(10, 2) NOT NULL        -- Rental price per hour
 );
 
+-- Create the Bookings table
+-- PURPOSE: Stores booking details linked to vehicles
+CREATE TABLE Bookings (
+    booking_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- Unique ID for the booking
+    vehicle_id INT NOT NULL,                            -- Vehicle ID (foreign key)
+    user_id INT NOT NULL,                               -- User ID (not a foreign key)
+    booking_date DATETIME NOT NULL,                     -- Date and time of booking
+    return_date DATETIME NOT NULL,                      -- Date and time of return
+    total_price DECIMAL(10, 2) NOT NULL,                -- Total price of the booking
+    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id) -- Foreign key relationship
+);
+
 -- Insert example data into the Vehicles table
-INSERT INTO Vehicles (vehicle_type, availability_status, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
-("Car", "Available", "Downtown Lot A", 100, "Clean", 20.00);
+INSERT INTO Vehicles (model, availability_status, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
+("Toyota Prius", "Available", "Downtown Lot A", 95, "Clean", 25.00),
+("Tesla Model 3", "Maintenance", "Uptown Garage", 80, "Needs Cleaning", 50.00),
+("Honda Civic", "Booked", "Central Parking", NULL, "Clean", 20.00),
+("Nissan Leaf", "Available", "Suburban Lot B", 100, "Clean", 30.00),
+("Ford Mustang", "Available", "Downtown Lot C", NULL, "Needs Cleaning", 40.00);
+
+-- Insert example data into the Bookings table
+INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price) VALUES
+(1, 123, '2024-12-01 10:00:00', '2024-12-01 14:00:00', 100.00),
+(3, 456, '2024-12-02 12:00:00', '2024-12-02 16:00:00', 80.00);
+
+
+-- **************************************************
+-- DATABASE: ecoDrive_payment_db
+-- PURPOSE: Tracks payment transactions for the 
+--          Payment Service
+-- **************************************************
+
+-- Drop and recreate the payment database
+DROP DATABASE IF EXISTS ecoDrive_payment_db;
+CREATE DATABASE ecoDrive_payment_db;
+USE ecoDrive_payment_db;
+
+-- Create the Payments table
+-- PURPOSE: Records payment details and statuses
+CREATE TABLE Payments (
+    payment_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for payment
+    user_id INT NOT NULL,                                -- Associated user ID
+    booking_id INT NOT NULL,                             -- Booking reference ID
+    amount DECIMAL(10, 2) NOT NULL,                      -- Payment amount
+    payment_method ENUM('Card', 'PayNow'),               -- Payment method used
+    payment_status ENUM('Pending', 'Completed', 'Refunded'), -- Status of the payment
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP       -- Record creation timestamp
+);
+
+-- Insert example data into the Payments table
+INSERT INTO Payments (user_id, booking_id, amount, payment_method, payment_status) VALUES
+(1, 101, 100.50, "Card", "Completed");

@@ -1,6 +1,7 @@
 package registration
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -185,18 +186,17 @@ func sendEmail(to, code string) error {
 	return nil
 }
 
-// RegisterUser handles user registration by verifying the code and updating the table.
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /register-user request...")
 
 	// Parse the incoming request
 	var user struct {
-		Email          string `json:"email"`
+		Email           string `json:"email"`
 		VerificationCode string `json:"verification_code"`
-		Name           string `json:"name"`
-		Password       string `json:"password"`
-		ContactNumber  string `json:"contact_number"`
-		Address        string `json:"address"`
+		Name            string `json:"name"`
+		Password        string `json:"password"`
+		ContactNumber   string `json:"contact_number"`
+		Address         string `json:"address"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -258,20 +258,70 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Password hashed successfully.")
 
-	// Update the user details in the database
+	// Update the local User table
+	log.Println("Updating local User table...")
 	_, err = db.Exec(`
-			UPDATE User
-			SET name = ?, password = ?, contact_number = ?, address = ?
-			WHERE email = ?`,
+		UPDATE User
+		SET name = ?, password = ?, contact_number = ?, address = ?
+		WHERE email = ?`,
 		user.Name, string(hashedPassword), user.ContactNumber, user.Address, user.Email)
 	if err != nil {
-		log.Printf("Error updating database: %v", err)
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		log.Printf("Error updating local User table: %v", err)
+		http.Error(w, "Failed to register user locally", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Local User table updated successfully.")
+
+	// Call the userMicroservice to add the user record
+	log.Println("Calling userMicroservice to create the user record...")
+	err = callUserMicroservice(user.Name, user.Email, user.ContactNumber, user.Address, string(hashedPassword))
+	if err != nil {
+		log.Printf("Error calling userMicroservice: %v", err)
+		http.Error(w, "Failed to register user in userMicroservice", http.StatusInternalServerError)
 		return
 	}
 
 	log.Println("User registration successful.")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "User registered successfully"}`))
+	w.Write([]byte(`{"message": "User registered successfully in both systems"}`))
+}
+
+
+// callUserMicroservice sends a request to userMicroservice to create a new user record
+func callUserMicroservice(name, email, contactNumber, address, password string) error {
+	userMicroserviceURL := "http://localhost:5100/api/v1/user/create" // Update with the actual userMicroservice URL
+
+	// Create the request payload
+	payload := map[string]string{
+		"name":           name,
+		"email":          email,
+		"contact_number": contactNumber,
+		"address":        address,
+		"password":       password,
+	}
+
+	// Convert the payload to JSON
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Error marshalling payload: %v", err)
+		return err
+	}
+
+	// Create the HTTP POST request
+	resp, err := http.Post(userMicroserviceURL, "application/json", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		log.Printf("Error sending request to userMicroservice: %v", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusCreated {
+		log.Printf("Unexpected status from userMicroservice: %v", resp.Status)
+		return fmt.Errorf("failed to create user record, status: %v", resp.Status)
+	}
+
+	log.Println("User record created successfully in userMicroservice.")
+	return nil
 }

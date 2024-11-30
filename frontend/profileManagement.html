@@ -35,14 +35,14 @@
     <link rel="stylesheet" href="./css/style.css" />
 
     <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
-    <link rel="stylesheet" href="./css/memberHome.css" />
+    <link rel="stylesheet" href="./css/profileManagement.css" />
     <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
 
     <!-- Linking JS -->
     <script src="./js/script.js" defer></script>
 
     <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
-    <script src="./js/memberHome.js" defer></script>
+    <script src="./js/profileManagement.js" defer></script>
     <!-- ######################################## END OF PAGE'S JS ########################################################### -->
 
     <!-- Add a favicon to the tab bar -->
@@ -69,25 +69,72 @@
           <div id="customAlertContainer"></div>
 
           <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
-          <!-- Welcome Message -->
-          <h1 class="welcome-message">
-            Welcome, <span id="memberName">Member Name</span>!
-          </h1>
-          <p class="mb-3">What would you like to do today?</p>
+          <h1 class="text-center mb-4">My Profile</h1>
 
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-            <button
-              class="btn btn-primary"
-              id="profileManagementButton"
-              onclick="window.location.href='./profileManagement.html'"
-            >
-              <i class="fas fa-user-cog"></i> Profile Management
-            </button>
-            <button class="btn btn-success" id="bookVehicleButton">
-              <i class="fas fa-car"></i> Book Vehicle
-            </button>
+          <!-- Profile Information -->
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+              <form id="profileForm">
+                <div class="mb-3">
+                  <label for="membership" class="form-label"
+                    >Membership Status</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="membership"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="name" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="name" readonly />
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="contact" class="form-label">Contact Number</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="contact"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="address" class="form-label">Address</label>
+                  <textarea
+                    class="form-control"
+                    id="address"
+                    rows="3"
+                    readonly
+                  ></textarea>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-primary w-100"
+                  id="editButton"
+                >
+                  <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success w-100 mt-3 d-none"
+                  id="saveButton"
+                >
+                  <i class="fas fa-save"></i> Save Changes
+                </button>
+              </form>
+            </div>
           </div>
+
           <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
         </div>
       </div>
