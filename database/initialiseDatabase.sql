@@ -14,7 +14,7 @@ USE ecoDrive_authentication_db;
 CREATE TABLE Authentication (
     auth_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for authentication record
     user_id INT NOT NULL,                             -- Associated user ID
-    auth_token VARCHAR(255) NOT NULL UNIQUE,          -- Authentication token
+    auth_token VARCHAR(1000) NOT NULL UNIQUE,          -- Authentication token
     token_expiry TIMESTAMP NOT NULL                   -- Expiry timestamp of the token
 );
 
@@ -22,23 +22,23 @@ CREATE TABLE Authentication (
 INSERT INTO Authentication (user_id, auth_token, token_expiry) VALUES
 (1, "random_generated_token", "2024-12-31 23:59:59");
 
--- Create the Registration table
--- PURPOSE: Stores user registration details
-CREATE TABLE Registration (
-    registration_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for registration
-    name VARCHAR(100),                                        -- User's name
-    email VARCHAR(100) NOT NULL UNIQUE,                      -- User's email address
-    password VARCHAR(255) NULL,                              -- User's password (hashed)
-    membership_level ENUM('Basic', 'Premium', 'VIP'),        -- Membership tier
-    contact_number VARCHAR(15),                              -- User's contact number
-    address TEXT,                                            -- User's address
-    verification_code VARCHAR(10) NOT NULL,                  -- Verification code
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP           -- Record creation timestamp
+
+-- Create the User table
+-- PURPOSE: Stores user registration details (previously named Registration)
+CREATE TABLE User (
+    user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for the user
+    name VARCHAR(100),                                -- User's name
+    email VARCHAR(100) NOT NULL UNIQUE,              -- User's email address
+    password VARCHAR(255) NULL,                      -- User's password (hashed)
+    contact_number VARCHAR(15),                      -- User's contact number
+    address TEXT,                                    -- User's address
+    verification_code VARCHAR(10) NOT NULL,          -- Verification code
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP   -- Record creation timestamp
 );
 
--- Insert example data into the Registration table
-INSERT INTO Registration (name, email, password, membership_level, contact_number, address, verification_code, created_at) VALUES
-("Alice Johnson", "alice.johnson@example.com", "hashed_password", "Premium", "12345678", "123 Main St, Singapore", "123456", NOW());
+-- Insert example data into the User table
+INSERT INTO User (name, email, password, membership_level, contact_number, address, verification_code, created_at) VALUES
+("Alice Johnson", "alice.johnson@example.com", "hashed_password", "12345678", "123 Main St, Singapore", "123456", NOW());
 
 
 -- **************************************************

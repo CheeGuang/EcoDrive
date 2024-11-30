@@ -13,10 +13,11 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// Registration represents the structure of the data in the registration table.
-type Registration struct {
+// User represents the structure of the data in the User table.
+type User struct {
 	ID               int    `json:"id"`
 	Email            string `json:"email"`
 	VerificationCode string `json:"verification_code"`
@@ -51,16 +52,16 @@ func init() {
 // SendVerificationCode handles sending the verification code and storing it in the database.
 func SendVerificationCode(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /send-verification request...")
-	var registration Registration
+	var user User
 
 	// Parse the incoming request
-	err := json.NewDecoder(r.Body).Decode(&registration)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		log.Printf("Error parsing request body: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	log.Printf("Parsed request: %+v", registration)
+	log.Printf("Parsed request: %+v", user)
 
 	// Generate a random 6-digit verification code
 	rand.Seed(time.Now().UnixNano())
@@ -70,11 +71,11 @@ func SendVerificationCode(w http.ResponseWriter, r *http.Request) {
 	// Insert or update email and verification code in the database
 	log.Println("Inserting or updating verification code in the database...")
 	_, err = db.Exec(`
-		INSERT INTO registration (email, verification_code, created_at)
+		INSERT INTO User (email, verification_code, created_at)
 		VALUES (?, ?, ?)
 		ON DUPLICATE KEY UPDATE
 		verification_code = VALUES(verification_code), created_at = VALUES(created_at)
-	`, registration.Email, verificationCode, time.Now().Format("2006-01-02 15:04:05"))
+	`, user.Email, verificationCode, time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		log.Printf("Error inserting or updating database: %v", err)
 		http.Error(w, "Database error", http.StatusInternalServerError)
@@ -83,8 +84,8 @@ func SendVerificationCode(w http.ResponseWriter, r *http.Request) {
 	log.Println("Verification code inserted or updated in the database.")
 
 	// Send the verification code via email
-	log.Printf("Sending verification code to %s...", registration.Email)
-	err = sendEmail(registration.Email, verificationCode)
+	log.Printf("Sending verification code to %s...", user.Email)
+	err = sendEmail(user.Email, verificationCode)
 	if err != nil {
 		log.Printf("Error sending email: %v", err)
 		http.Error(w, "Failed to send email", http.StatusInternalServerError)
@@ -97,7 +98,6 @@ func SendVerificationCode(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "Verification code sent successfully"}`))
 }
-
 
 // sendEmail sends an email containing the verification code.
 func sendEmail(to, code string) error {
@@ -190,7 +190,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling /register-user request...")
 
 	// Parse the incoming request
-	var registration struct {
+	var user struct {
 		Email          string `json:"email"`
 		VerificationCode string `json:"verification_code"`
 		Name           string `json:"name"`
@@ -198,22 +198,22 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		ContactNumber  string `json:"contact_number"`
 		Address        string `json:"address"`
 	}
-	err := json.NewDecoder(r.Body).Decode(&registration)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		log.Printf("Error parsing request body: %v", err)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	log.Printf("Parsed request: %+v", registration)
+	log.Printf("Parsed request: %+v", user)
 
 	// Verify the provided verification code and timestamp
 	var dbVerificationCode string
-	var dbCreatedAt string // Use string to avoid the scanning error
+	var dbCreatedAt string
 
 	log.Println("Checking verification code in the database...")
 	err = db.QueryRow(
-		"SELECT verification_code, created_at FROM registration WHERE email = ?",
-		registration.Email,
+		"SELECT verification_code, created_at FROM User WHERE email = ?",
+		user.Email,
 	).Scan(&dbVerificationCode, &dbCreatedAt)
 	if err == sql.ErrNoRows {
 		log.Println("Email not found.")
@@ -235,7 +235,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the verification code matches
-	if dbVerificationCode != registration.VerificationCode {
+	if dbVerificationCode != user.VerificationCode {
 		log.Println("Verification code mismatch.")
 		http.Error(w, "Invalid verification code", http.StatusUnauthorized)
 		return
@@ -248,16 +248,22 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Debug the values being passed to the update query
-	log.Printf("Updating user details: name=%s, password=%s, contact_number=%s, address=%s, email=%s",
-		registration.Name, registration.Password, registration.ContactNumber, registration.Address, registration.Email)
+	// Hash the password
+	log.Println("Hashing the password...")
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("Error hashing password: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Password hashed successfully.")
 
 	// Update the user details in the database
 	_, err = db.Exec(`
-		UPDATE registration
-		SET name = ?, password = ?, contact_number = ?, address = ?
-		WHERE email = ?`,
-		registration.Name, registration.Password, registration.ContactNumber, registration.Address, registration.Email)
+			UPDATE User
+			SET name = ?, password = ?, contact_number = ?, address = ?
+			WHERE email = ?`,
+		user.Name, string(hashedPassword), user.ContactNumber, user.Address, user.Email)
 	if err != nil {
 		log.Printf("Error updating database: %v", err)
 		http.Error(w, "Database error", http.StatusInternalServerError)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"authenticationMicroservice/registration"
+	"authenticationMicroservice/authentication"
 	"log"
 	"net/http"
 
@@ -16,6 +17,9 @@ func main() {
 	// Registration endpoints
 	router.HandleFunc("/api/v1/authentication/send-verification", registration.SendVerificationCode).Methods("POST")
 	router.HandleFunc("/api/v1/authentication/register-user", registration.RegisterUser).Methods("POST")
+
+	// Authentication endpoint
+	router.HandleFunc("/api/v1/authentication/login", authentication.AuthenticateUser).Methods("POST")
 
 
 	// Add CORS support
