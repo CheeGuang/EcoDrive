@@ -86,7 +86,6 @@ USE ecoDrive_vehicle_db;
 CREATE TABLE Vehicles (
     vehicle_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  -- Unique ID for the vehicle
     model VARCHAR(255) NOT NULL,                         -- Model of the vehicle
-    availability_status ENUM('Available', 'Booked', 'Maintenance') NOT NULL, -- Availability status
     location VARCHAR(255),                               -- Current location of the vehicle
     charge_level INT,                                    -- Battery charge level (for EVs)
     cleanliness_status ENUM('Clean', 'Needs Cleaning'), -- Cleanliness status of the vehicle
@@ -106,12 +105,12 @@ CREATE TABLE Bookings (
 );
 
 -- Insert example data into the Vehicles table
-INSERT INTO Vehicles (model, availability_status, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
-("Toyota Prius", "Available", "Downtown Lot A", 95, "Clean", 25.00),
-("Tesla Model 3", "Maintenance", "Uptown Garage", 80, "Needs Cleaning", 50.00),
-("Honda Civic", "Booked", "Central Parking", NULL, "Clean", 20.00),
-("Nissan Leaf", "Available", "Suburban Lot B", 100, "Clean", 30.00),
-("Ford Mustang", "Available", "Downtown Lot C", NULL, "Needs Cleaning", 40.00);
+INSERT INTO Vehicles (model, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
+("Toyota Prius", "Downtown Lot A", 95, "Clean", 25.00),
+("Tesla Model 3", "Uptown Garage", 80, "Needs Cleaning", 50.00),
+("Honda Civic", "Central Parking", NULL, "Clean", 20.00),
+("Nissan Leaf", "Suburban Lot B", 100, "Clean", 30.00),
+("Ford Mustang", "Downtown Lot C", NULL, "Needs Cleaning", 40.00);
 
 -- Insert example data into the Bookings table
 INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price) VALUES

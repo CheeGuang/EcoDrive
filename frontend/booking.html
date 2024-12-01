@@ -35,14 +35,14 @@
     <link rel="stylesheet" href="./css/style.css" />
 
     <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
-    <link rel="stylesheet" href="./css/memberHome.css" />
+    <!-- <link rel="stylesheet" href="./css/" /> -->
     <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
 
     <!-- Linking JS -->
     <script src="./js/script.js" defer></script>
 
     <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
-    <script src="./js/memberHome.js" defer></script>
+    <script src="./js/booking.js" defer></script>
     <!-- ######################################## END OF PAGE'S JS ########################################################### -->
 
     <!-- Add a favicon to the tab bar -->
@@ -69,36 +69,30 @@
           <div id="customAlertContainer"></div>
 
           <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
-          <!-- Welcome Message -->
-          <h1 class="welcome-message">
-            Welcome, <span id="memberName">Member Name</span>!
-          </h1>
-          <p class="mb-3">What would you like to do today?</p>
-
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-            <button
-              class="btn btn-success"
-              id="myProfileButton"
-              onclick="window.location.href='./myProfile.html'"
-            >
-              <i class="fas fa-user-cog"></i> My Profile
+          <h1>Book Vehicle</h1>
+          <form id="bookingForm">
+            <div class="mb-3">
+              <label for="bookingDate" class="form-label">Booking Date</label>
+              <input
+                type="datetime-local"
+                id="bookingDate"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="returnDate" class="form-label">Return Date</label>
+              <input
+                type="datetime-local"
+                id="returnDate"
+                class="form-control"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-success">
+              Confirm Booking
             </button>
-            <button
-              class="btn btn-success"
-              id="viewVehicleButton"
-              onclick="window.location.href='./vehicleAvailability.html'"
-            >
-              <i class="fas fa-car"></i> View Vehicles
-            </button>
-            <button
-              class="btn btn-success"
-              id="myBookingsButton"
-              onclick="window.location.href='./myBookings.html'"
-            >
-              <i class="fas fa-calendar-check"></i> My Bookings
-            </button>
-          </div>
+          </form>
           <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
         </div>
       </div>

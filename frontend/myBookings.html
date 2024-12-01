@@ -35,14 +35,14 @@
     <link rel="stylesheet" href="./css/style.css" />
 
     <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
-    <link rel="stylesheet" href="./css/memberHome.css" />
+    <!-- <link rel="stylesheet" href="./css/" /> -->
     <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
 
     <!-- Linking JS -->
     <script src="./js/script.js" defer></script>
 
     <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
-    <script src="./js/memberHome.js" defer></script>
+    <script src="./js/myBookings.js" defer></script>
     <!-- ######################################## END OF PAGE'S JS ########################################################### -->
 
     <!-- Add a favicon to the tab bar -->
@@ -69,36 +69,80 @@
           <div id="customAlertContainer"></div>
 
           <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
-          <!-- Welcome Message -->
-          <h1 class="welcome-message">
-            Welcome, <span id="memberName">Member Name</span>!
-          </h1>
-          <p class="mb-3">What would you like to do today?</p>
+          <h1>My Bookings</h1>
+          <!-- Subtitle -->
+          <p class="mb-3">Review and manage your current and past bookings.</p>
 
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-            <button
-              class="btn btn-success"
-              id="myProfileButton"
-              onclick="window.location.href='./myProfile.html'"
-            >
-              <i class="fas fa-user-cog"></i> My Profile
-            </button>
-            <button
-              class="btn btn-success"
-              id="viewVehicleButton"
-              onclick="window.location.href='./vehicleAvailability.html'"
-            >
-              <i class="fas fa-car"></i> View Vehicles
-            </button>
-            <button
-              class="btn btn-success"
-              id="myBookingsButton"
-              onclick="window.location.href='./myBookings.html'"
-            >
-              <i class="fas fa-calendar-check"></i> My Bookings
-            </button>
+          <!-- Booking List -->
+          <div id="bookingList" class="mt-4"></div>
+          <!-- Booking Modification Modal -->
+          <div
+            class="modal fade"
+            id="modifyBookingModal"
+            tabindex="-1"
+            aria-labelledby="modifyBookingModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modifyBookingModalLabel">
+                    Modify Booking
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <form id="modifyBookingForm">
+                    <div class="mb-3">
+                      <label for="startDate" class="form-label"
+                        >Start Date</label
+                      >
+                      <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="startDate"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="endDate" class="form-label">End Date</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="endDate"
+                        required
+                      />
+                    </div>
+                    <!-- Hidden Inputs -->
+                    <input type="hidden" id="bookingId" />
+                    <input type="hidden" id="rentalPricePerHour" />
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="saveChangesButton"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+
           <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
         </div>
       </div>
