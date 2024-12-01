@@ -36,6 +36,16 @@
         <li class="nav-item">
           <a class="nav-link text-dark" href="myBookings.html">My Bookings</a>
         </li>
+        <li class="nav-item">
+          <button
+            class="btn btn-danger text-white ms-3"
+            id="signOutButton"
+            type="button"
+            onclick="localStorage.clear(); window.location.href='index.html';"
+          >
+            Sign Out
+          </button>
+        </li>
       </ul>
     </div>
   </div>

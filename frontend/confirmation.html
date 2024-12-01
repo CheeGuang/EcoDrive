@@ -42,7 +42,7 @@
     <script src="./js/script.js" defer></script>
 
     <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
-    <script src="./js/booking.js" defer></script>
+    <script src="./js/confirmation.js" defer></script>
     <!-- ######################################## END OF PAGE'S JS ########################################################### -->
 
     <!-- Add a favicon to the tab bar -->
@@ -69,30 +69,77 @@
           <div id="customAlertContainer"></div>
 
           <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
-          <h1>Book Vehicle</h1>
-          <form id="bookingForm">
-            <div class="mb-3">
-              <label for="bookingDate" class="form-label">Booking Date</label>
-              <input
-                type="datetime-local"
-                id="bookingDate"
-                class="form-control"
-                required
-              />
+          <h2 class="mt-3">Booking Confirmation</h2>
+          <p class="text-muted">
+            Thank you for choosing EcoDrive! Here are your details:
+          </p>
+
+          <div class="card">
+            <div class="card-body text-start">
+              <!-- Booking ID -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Booking ID</label>
+                <p id="bookingId" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Payment ID -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Payment ID</label>
+                <p id="paymentId" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- User ID -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">User ID</label>
+                <p id="userId" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Vehicle ID -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Vehicle ID</label>
+                <p id="vehicleId" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Start Date -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Start Date/Time</label>
+                <p id="startDate" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- End Date -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">End Date/Time</label>
+                <p id="endDate" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Rental Duration -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Rental Duration</label>
+                <p id="rentalDuration" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Price Details -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Price per Hour</label>
+                <p id="pricePerHour" class="form-control-plaintext"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold">Total Price</label>
+                <p id="totalPrice" class="form-control-plaintext"></p>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Payment Method</label>
+                <p id="paymentMethod" class="form-control-plaintext"></p>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="returnDate" class="form-label">Return Date</label>
-              <input
-                type="datetime-local"
-                id="returnDate"
-                class="form-control"
-                required
-              />
             </div>
-            <button type="submit" class="btn btn-success">
-              Confirm Booking
-            </button>
-          </form>
+
+            <a href="./memberHome.html" class="btn btn-success mt-3">
+              <i class="fas fa-home"></i> Back to Home
+            </a>
+          </div>
           <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
         </div>
       </div>

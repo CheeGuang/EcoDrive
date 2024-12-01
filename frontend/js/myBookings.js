@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Retrieve and decode token from localStorage
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("You must be logged in to view your bookings.");
+    showCustomAlert("You must be logged in to view your bookings.");
     window.location.href = "./login.html"; // Redirect to login page if no token is found
     return;
   }
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const decodedToken = decodeToken(token);
   if (!decodedToken || !decodedToken.user_id) {
-    alert("Invalid session. Please log in again.");
+    showCustomAlert("Invalid session. Please log in again.");
     window.location.href = "./login.html";
     return;
   }
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return response.json();
     })
     .then((bookings) => {
-      if (bookings.length === 0) {
+      if (!bookings || bookings.length === 0) {
         bookingList.innerHTML =
           "<p>You have no bookings at the moment. Start renting today!</p>";
         return;
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     if (!startDate || !endDate || isNaN(rentalPricePerHour)) {
-      alert("Please fill in all fields.");
+      showCustomAlert("Please fill in all fields.");
       return;
     }
 
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const endDateTime = new Date(endDate);
 
     if (startDateTime >= endDateTime) {
-      alert("End date must be later than start date.");
+      showCustomAlert("End date must be later than start date.");
       return;
     }
 
@@ -161,12 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return response.text();
       })
       .then((message) => {
-        alert(message);
+        showCustomAlert(message);
         window.location.reload(); // Refresh the page
       })
       .catch((error) => {
         console.error(error);
-        alert("An error occurred while modifying the booking.");
+        showCustomAlert("An error occurred while modifying the booking.");
       });
   });
 });
@@ -184,11 +184,11 @@ function cancelBooking(bookingId) {
       if (!response.ok) {
         throw new Error("Failed to cancel the booking.");
       }
-      alert("Booking cancelled successfully.");
+      showCustomAlert("Booking cancelled successfully.");
       window.location.reload(); // Refresh the page to update the booking list
     })
     .catch((error) => {
       console.error(error);
-      alert("An error occurred while cancelling the booking.");
+      showCustomAlert("An error occurred while cancelling the booking.");
     });
 }

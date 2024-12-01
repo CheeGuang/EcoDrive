@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const endDate = document.getElementById("endDate").value;
 
     if (!startDate || !endDate) {
-      alert("Please select both start and end date-time.");
+      showCustomAlert("Please select both start and end date-time.");
       return;
     }
 
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const end = new Date(endDate);
 
     if (end <= start) {
-      alert("End date and time must be after start date and time.");
+      showCustomAlert("End date and time must be after start date and time.");
       return;
     }
 
@@ -46,12 +46,19 @@ document.addEventListener("DOMContentLoaded", () => {
           const totalPrice =
             rentalDurationHours * vehicle.rental_price_per_hour;
 
+          // Generate a Google Maps query URL for the vehicle's location
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            vehicle.location
+          )}`;
+
           const vehicleCard = `
                   <div class="card mb-3">
                     <div class="card-body">
                       <h5 class="card-title">${vehicle.model}</h5>
                       <p class="card-text">
-                        Location: ${vehicle.location} <br />
+                        Location: ${
+                          vehicle.location
+                        } <a href="${googleMapsUrl}" target="_blank" class="text-primary">View in Google Maps</a> <br />
                         Rental Price per Hour: $${vehicle.rental_price_per_hour.toFixed(
                           2
                         )} <br />
@@ -61,7 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
                       </p>
                       <button class="btn btn-primary" onclick="makeBooking(${
                         vehicle.vehicle_id
-                      }, '${startDate}', '${endDate}')">Book Now</button>
+                      }, '${startDate}', '${endDate}', ${vehicle.rental_price_per_hour.toFixed(
+            2
+          )})">Book Now</button>
                     </div>
                   </div>`;
           vehicleList.innerHTML += vehicleCard;
@@ -69,17 +78,33 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error(error);
-        alert("An error occurred while fetching vehicle availability.");
+        showCustomAlert(
+          "An error occurred while fetching vehicle availability."
+        );
       });
   });
 });
 
-function makeBooking(vehicleId, startDate, endDate) {
+function makeBooking(vehicleId, startDate, endDate, pricePerHour) {
+  // Calculate rental duration in hours
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const rentalDurationHours = Math.ceil((end - start) / (1000 * 60 * 60));
+
+  const totalPrice = (rentalDurationHours * parseFloat(pricePerHour)).toFixed(
+    2
+  );
+
+  // Encode query parameters
   const queryParams = new URLSearchParams({
     vehicleId,
     start_date: startDate,
     end_date: endDate,
+    rentalDuration: rentalDurationHours,
+    pricePerHour,
+    totalPrice,
   }).toString();
 
-  window.location.href = `./booking.html?${queryParams}`;
+  // Redirect to the checkout page with query parameters
+  window.location.href = `./checkout.html?${queryParams}`;
 }

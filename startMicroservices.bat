@@ -15,6 +15,11 @@ cd userMicroservice
 start cmd /k "go run main.go"
 cd ..
 
+echo Starting Payment Microservice...
+cd paymentMicroservice
+start cmd /k "go run main.go"
+cd ..
+
 echo Starting Frontend Live Server...
 cd frontend
 start cmd /k "npx live-server"

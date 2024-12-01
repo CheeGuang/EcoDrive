@@ -3,6 +3,7 @@ package booking
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -52,15 +53,23 @@ type Booking struct {
 	TotalPrice  float64 `json:"total_price"`
 }
 
-// CreateBooking allows users to create a new booking
 func CreateBooking(w http.ResponseWriter, r *http.Request) {
-	var payload Booking
+	var payload struct {
+		VehicleID   int     `json:"vehicle_id"`
+		UserID      int     `json:"user_id"`
+		BookingDate string  `json:"booking_date"`
+		ReturnDate  string  `json:"return_date"`
+		TotalPrice  float64 `json:"total_price"`
+	}
+
+	// Decode the JSON request
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	_, err := db.Exec(`
+	// Insert the booking into the database
+	result, err := db.Exec(`
 		INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price)
 		VALUES (?, ?, ?, ?, ?)`,
 		payload.VehicleID, payload.UserID, payload.BookingDate, payload.ReturnDate, payload.TotalPrice)
@@ -70,9 +79,19 @@ func CreateBooking(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Retrieve the last inserted booking ID
+	bookingID, err := result.LastInsertId()
+	if err != nil {
+		log.Printf("Error retrieving booking ID: %v", err)
+		http.Error(w, "Failed to retrieve booking ID", http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with the booking ID
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Booking created successfully"))
+	w.Write([]byte(fmt.Sprintf(`{"booking_id": %d}`, bookingID)))
 }
+
 
 // ModifyBooking allows users to modify an existing booking
 func ModifyBooking(w http.ResponseWriter, r *http.Request) {

@@ -106,11 +106,11 @@ CREATE TABLE Bookings (
 
 -- Insert example data into the Vehicles table
 INSERT INTO Vehicles (model, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
-("Toyota Prius", "Downtown Lot A", 95, "Clean", 25.00),
-("Tesla Model 3", "Uptown Garage", 80, "Needs Cleaning", 50.00),
-("Honda Civic", "Central Parking", NULL, "Clean", 20.00),
-("Nissan Leaf", "Suburban Lot B", 100, "Clean", 30.00),
-("Ford Mustang", "Downtown Lot C", NULL, "Needs Cleaning", 40.00);
+("Toyota Prius", "Marina Barrage Public Carpark", 95, "Clean", 25.00),
+("Tesla Model 3", "ION Orchard Car Park", 80, "Needs Cleaning", 50.00),
+("Honda Civic", "NEX Carpark", NULL, "Clean", 20.00),
+("Nissan Leaf", "Prime Auto Care VivoCity (Yellow Zone) B2 Carpark", 100, "Clean", 30.00),
+("Ford Mustang", "Suntec City Carpark F", NULL, "Needs Cleaning", 40.00);
 
 -- Insert example data into the Bookings table
 INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price) VALUES
@@ -138,9 +138,26 @@ CREATE TABLE Payments (
     amount DECIMAL(10, 2) NOT NULL,                      -- Payment amount
     payment_method ENUM('Card', 'PayNow'),               -- Payment method used
     payment_status ENUM('Pending', 'Completed', 'Refunded'), -- Status of the payment
+    discount DECIMAL(10, 2) DEFAULT 0.00,                -- Discount amount
+    final_amount DECIMAL(10, 2) DEFAULT 0.00,            -- Final amount after discount
+    invoice_pdf TEXT,                                    -- Path to the invoice PDF
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP       -- Record creation timestamp
 );
 
 -- Insert example data into the Payments table
-INSERT INTO Payments (user_id, booking_id, amount, payment_method, payment_status) VALUES
-(1, 101, 100.50, "Card", "Completed");
+INSERT INTO Payments (user_id, booking_id, amount, payment_method, payment_status, discount, final_amount) VALUES
+(1, 101, 100.50, "Card", "Completed", 10.00, 90.50);
+
+-- Create the Discounts table
+-- PURPOSE: Manages promotional discounts by membership level
+CREATE TABLE Discounts (
+    discount_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- Unique ID for the discount
+    membership_level ENUM('Basic', 'Premium', 'VIP') NOT NULL, -- Membership tier
+    discount_percentage DECIMAL(5, 2) NOT NULL          -- Discount percentage
+);
+
+-- Insert example data into the Discounts table
+INSERT INTO Discounts (membership_level, discount_percentage) VALUES
+('Basic', 5.00),
+('Premium', 10.00),
+('VIP', 20.00);

@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify({ return_date: newReturnDate }),
     })
       .then((response) => response.text())
-      .then((message) => alert(message))
+      .then((message) => showCustomAlert(message))
       .catch((error) => console.error(error));
   });
 });
