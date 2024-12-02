@@ -15,6 +15,8 @@ func main() {
 	// Payment endpoints
 	router.HandleFunc("/api/v1/payment/real-time-bill", payment.CalculateRealTimeBill).Methods("GET")
 	router.HandleFunc("/api/v1/payment/process", payment.ProcessPayment).Methods("POST")
+	router.HandleFunc("/api/v1/membership/payment", payment.ProcessMembershipPayment).Methods("POST")
+
 
 	// Add CORS support
 	corsHandler := handlers.CORS(
