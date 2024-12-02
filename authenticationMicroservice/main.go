@@ -30,6 +30,6 @@ func main() {
 	)(router)
 
 	// Start the server
-	log.Println("Server is running on port 5050...")
+	log.Println("Authentication Microservice is running on port 5050...")
 	log.Fatal(http.ListenAndServe(":5050", corsHandler))
 }

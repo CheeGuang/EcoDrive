@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const bookingList = document.getElementById("bookingList");
+  const activeBookingList = document.getElementById("activeBookingList");
+  const pastBookingList = document.getElementById("pastBookingList");
 
   // Retrieve and decode token from localStorage
   const token = localStorage.getItem("token");
@@ -40,26 +41,40 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then((bookings) => {
       if (!bookings || bookings.length === 0) {
-        bookingList.innerHTML =
-          "<p>You have no bookings at the moment. Start renting today!</p>";
+        activeBookingList.innerHTML =
+          "<p>You have no active bookings at the moment. Start renting today!</p>";
+        pastBookingList.innerHTML =
+          "<p>You have no past bookings at the moment.</p>";
         return;
       }
 
-      bookings.forEach((booking) => {
-        const startDate = new Date(booking.booking_date);
-        const endDate = new Date(booking.return_date);
+      const now = new Date();
 
-        // Calculate the duration in hours
-        const durationInHours = Math.ceil(
-          (endDate - startDate) / (1000 * 60 * 60)
-        );
+      // Separate active and past bookings
+      const activeBookings = bookings.filter(
+        (booking) => new Date(booking.return_date) > now
+      );
+      const pastBookings = bookings.filter(
+        (booking) => new Date(booking.return_date) <= now
+      );
 
-        // Calculate the total price based on price per hour
-        const totalPrice = Math.ceil(
-          durationInHours * booking.rental_price_per_hour
-        );
+      // Render Active Bookings
+      if (activeBookings.length === 0) {
+        activeBookingList.innerHTML =
+          "<p>You have no active bookings at the moment. Start renting today!</p>";
+      } else {
+        activeBookings.forEach((booking) => {
+          const startDate = new Date(booking.booking_date);
+          const endDate = new Date(booking.return_date);
 
-        const bookingCard = `
+          const durationInHours = Math.ceil(
+            (endDate - startDate) / (1000 * 60 * 60)
+          );
+          const totalPrice = Math.ceil(
+            durationInHours * booking.rental_price_per_hour
+          );
+
+          const bookingCard = `
               <div class="card mb-3">
                 <div class="card-body">
                   <h5 class="card-title">${booking.model}</h5>
@@ -78,10 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
                   <button class="btn btn-warning" onclick="openModifyModal(${
                     booking.booking_id
                   }, '${booking.booking_date}', '${booking.return_date}', ${
-          booking.rental_price_per_hour
-        })">
-                Modify Booking
-              </button>
+            booking.rental_price_per_hour
+          })">
+                    Modify Booking
+                  </button>
                   <button class="btn btn-danger" onclick="cancelBooking(${
                     booking.booking_id
                   })">
@@ -89,12 +104,53 @@ document.addEventListener("DOMContentLoaded", () => {
                   </button>
                 </div>
               </div>`;
-        bookingList.innerHTML += bookingCard;
-      });
+          activeBookingList.innerHTML += bookingCard;
+        });
+      }
+
+      // Render Past Bookings
+      if (pastBookings.length === 0) {
+        pastBookingList.innerHTML =
+          "<p>You have no past bookings at the moment.</p>";
+      } else {
+        pastBookings.forEach((booking) => {
+          const startDate = new Date(booking.booking_date);
+          const endDate = new Date(booking.return_date);
+
+          const durationInHours = Math.ceil(
+            (endDate - startDate) / (1000 * 60 * 60)
+          );
+          const totalPrice = Math.ceil(
+            durationInHours * booking.rental_price_per_hour
+          );
+
+          const bookingCard = `
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">${booking.model}</h5>
+                  <p class="card-text">
+                    Booking ID: ${booking.booking_id} <br />
+                    Start Date: ${startDate.toLocaleString()} <br />
+                    End Date: ${endDate.toLocaleString()} <br />
+                    Location: ${booking.location} <br />
+                    Charge Level: ${booking.charge_level}% <br />
+                    Rental Price per Hour: $${booking.rental_price_per_hour.toFixed(
+                      2
+                    )} <br />
+                    Total Duration: ${durationInHours} hour(s) <br />
+                    Total Price: $${totalPrice.toFixed(2)}
+                  </p>
+                </div>
+              </div>`;
+          pastBookingList.innerHTML += bookingCard;
+        });
+      }
     })
     .catch((error) => {
       console.error(error);
-      bookingList.innerHTML =
+      activeBookingList.innerHTML =
+        "<p>An error occurred while fetching your bookings. Please try again later.</p>";
+      pastBookingList.innerHTML =
         "<p>An error occurred while fetching your bookings. Please try again later.</p>";
     });
 

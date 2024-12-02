@@ -4,17 +4,35 @@ document.addEventListener("DOMContentLoaded", function () {
   const editButton = document.getElementById("editButton");
   const saveButton = document.getElementById("saveButton");
 
+  // Decode the JWT to extract user information
+  function getUserIdFromToken() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode the token payload
+      return payload.user_id; // Assuming the token contains a user_id field
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  }
+
   // Fetch and populate user profile data
   async function fetchProfile() {
     const token = localStorage.getItem("token");
-    if (!token) {
+    const userId = getUserIdFromToken();
+
+    if (!token || !userId) {
       showCustomAlert("You are not logged in. Redirecting to login page.");
       window.location.href = "./login.html";
       return;
     }
 
     try {
-      const response = await fetch(`${apiUrl}/profile?user_id=2`, {
+      const response = await fetch(`${apiUrl}/profile?user_id=${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

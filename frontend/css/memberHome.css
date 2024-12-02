@@ -2,7 +2,7 @@
   margin-top: 20px;
   display: flex;
   justify-content: center;
-  gap: 30px; /* Add spacing between buttons */
+  gap: 15px; /* Add spacing between buttons */
 }
 
 .action-buttons .btn {

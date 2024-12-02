@@ -1,0 +1,69 @@
+h3 {
+  color: #000 !important; /* Set h4 to black */
+}
+
+.card {
+  border-radius: 15px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100%; /* Ensures consistent card height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.col-md-4 {
+  margin-bottom: 60px;
+}
+
+.card-body {
+  border-top-left-radius: 15px !important;
+  border-top-right-radius: 15px !important;
+}
+
+.card-header {
+  border-top-left-radius: 15px !important;
+  border-top-right-radius: 15px !important;
+}
+
+.card-body ul {
+  text-align: left;
+  padding-left: 0;
+}
+
+.card-body ul li {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+.membership-btn {
+  border-radius: 50px;
+  font-weight: bold;
+  margin-top: 24px; /* Add margin to buttons */
+  padding: 10px;
+  width: 100%;
+  color: #000;
+}
+
+.membership-btn:hover {
+  color: #000;
+}
+
+/* Style for the current plan text */
+.current-plan {
+  width: 100%;
+  text-align: center;
+  background-color: #e9ecef;
+  padding: 10px 0;
+  border-radius: 50px;
+  font-weight: bold;
+  color: #333;
+  height: 45px; /* Matches button height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px !important; /* Add margin to buttons */
+}
+
+.fa-check-circle {
+  margin-right: 10px;
+}

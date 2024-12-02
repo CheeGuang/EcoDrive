@@ -1,0 +1,9 @@
+/* Positioning of the tick icon */
+#cardNumberTick {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 1.5rem; /* Adjust the size of the tick */
+  color: #28a745; /* Green color for success */
+}

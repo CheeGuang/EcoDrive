@@ -205,7 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Redirect to confirmation.html with query parameters
         showCustomAlert("Payment successful!");
-        window.location.href = `./confirmation.html?${queryParams}`;
+        setTimeout(() => {
+          window.location.href = `./confirmation.html?${queryParams}`;
+        }, 1000); // 1000 milliseconds = 1 second
       })
       .catch((error) => {
         console.error("Payment error:", error);
