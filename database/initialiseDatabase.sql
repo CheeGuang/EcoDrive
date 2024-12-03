@@ -116,9 +116,9 @@ CREATE TABLE Bookings (
 INSERT INTO Vehicles (model, location, charge_level, cleanliness_status, rental_price_per_hour) VALUES
 ("Toyota Prius", "Marina Barrage Public Carpark", 95, "Clean", 25.00),
 ("Tesla Model 3", "ION Orchard Car Park", 80, "Needs Cleaning", 50.00),
-("Honda Civic", "NEX Carpark", 0, "Clean", 20.00),
+("Honda Civic", "NEX Carpark", 70, "Clean", 20.00),
 ("Nissan Leaf", "Prime Auto Care VivoCity (Yellow Zone) B2 Carpark", 100, "Clean", 30.00),
-("Ford Mustang", "Suntec City Carpark F", 0, "Needs Cleaning", 40.00);
+("Ford Mustang", "Suntec City Carpark F", 70, "Needs Cleaning", 40.00);
 
 -- Insert example data into the Bookings table
 INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price) VALUES

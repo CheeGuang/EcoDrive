@@ -158,7 +158,7 @@ func ProcessPayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Notify booking service
-	apiURL := "http://localhost:5150/api/v1/vehicle/booking"
+	apiURL := "http://vehicle:5150/api/v1/vehicle/booking"
 	bookingPayload := map[string]interface{}{
 		"vehicle_id":   vehicleID,
 		"user_id":      payment.UserID,
@@ -474,7 +474,7 @@ func ProcessMembershipPayment(w http.ResponseWriter, r *http.Request) {
 
 	// Step 2: Call API to update the user's membership level
 	log.Println("[DEBUG] Updating user membership level via API")
-	apiURL := "http://localhost:5100/api/v1/user/membership/update"
+	apiURL := "http://user:5100/api/v1/user/membership/update"
 	payload := map[string]interface{}{
 		"user_id":         payment.UserID,
 		"membership_tier": payment.MembershipLevel,

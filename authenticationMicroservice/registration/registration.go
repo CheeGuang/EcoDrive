@@ -290,7 +290,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 // callUserMicroservice sends a request to userMicroservice to create a new user record
 func callUserMicroservice(name, email, contactNumber, address, password string) error {
-	userMicroserviceURL := "http://localhost:5100/api/v1/user/create" // Update with the actual userMicroservice URL
+	userMicroserviceURL := "http://user:5100/api/v1/user/create"
 
 	// Create the request payload
 	payload := map[string]string{
