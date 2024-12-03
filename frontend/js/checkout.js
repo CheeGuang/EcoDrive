@@ -42,10 +42,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // Populate static fields
   document.getElementById("startDate").textContent = new Date(
     startDate
-  ).toLocaleString();
+  ).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
   document.getElementById("endDate").textContent = new Date(
     endDate
-  ).toLocaleString();
+  ).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
   document.getElementById(
     "rentalDuration"
   ).textContent = `${rentalDuration} hours`;

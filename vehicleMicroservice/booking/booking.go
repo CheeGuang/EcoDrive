@@ -213,12 +213,18 @@ func GetBooking(w http.ResponseWriter, r *http.Request) {
 
 // GetBookingsByUserID retrieves all bookings for a specific user
 func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetBookingsByUserID: Start processing request") // Debug: Start of function
+
 	params := mux.Vars(r)
+	log.Printf("GetBookingsByUserID: Extracted params: %v\n", params) // Debug: Log params
+
 	userID, err := strconv.Atoi(params["user_id"])
 	if err != nil {
+		log.Printf("GetBookingsByUserID: Invalid user ID: %v\n", params["user_id"]) // Debug: Invalid ID
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
+	log.Printf("GetBookingsByUserID: Converted user ID: %d\n", userID) // Debug: Valid ID
 
 	rows, err := db.Query(`
 		SELECT 
@@ -229,11 +235,12 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 		JOIN Vehicles v ON b.vehicle_id = v.vehicle_id
 		WHERE b.user_id = ?`, userID)
 	if err != nil {
-		log.Printf("Error retrieving bookings: %v", err)
+		log.Printf("GetBookingsByUserID: Error retrieving bookings: %v\n", err) // Debug: Query error
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
+	log.Println("GetBookingsByUserID: Query executed successfully") // Debug: Query success
 
 	var bookings []struct {
 		BookingID         int     `json:"booking_id"`
@@ -273,13 +280,89 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 			&booking.ChargeLevel,
 			&booking.RentalPricePerHour,
 		); err != nil {
-			log.Printf("Error scanning row: %v", err)
+			log.Printf("GetBookingsByUserID: Error scanning row: %v\n", err) // Debug: Scan error
 			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
+		log.Printf("GetBookingsByUserID: Retrieved booking: %+v\n", booking) // Debug: Retrieved booking
 		bookings = append(bookings, booking)
 	}
 
+	if err := rows.Err(); err != nil {
+		log.Printf("GetBookingsByUserID: Row iteration error: %v\n", err) // Debug: Row iteration error
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("GetBookingsByUserID: Total bookings retrieved: %d\n", len(bookings)) // Debug: Number of bookings
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(bookings)
+	if err := json.NewEncoder(w).Encode(bookings); err != nil {
+		log.Printf("GetBookingsByUserID: Error encoding response: %v\n", err) // Debug: Encode error
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
+	log.Println("GetBookingsByUserID: Response sent successfully") // Debug: End of function
+}
+
+// GetBookingsByVehicleID retrieves booking dates for a specific vehicle
+func GetBookingsByVehicleID(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetBookingsByVehicleID: Start processing request") // Debug: Start of function
+
+	params := mux.Vars(r)
+	log.Printf("GetBookingsByVehicleID: Extracted params: %v\n", params) // Debug: Log params
+
+	vehicleID, err := strconv.Atoi(params["vehicle_id"])
+	if err != nil {
+		log.Printf("GetBookingsByVehicleID: Invalid vehicle ID: %v\n", params["vehicle_id"]) // Debug: Invalid ID
+		http.Error(w, "Invalid vehicle ID", http.StatusBadRequest)
+		return
+	}
+	log.Printf("GetBookingsByVehicleID: Converted vehicle ID: %d\n", vehicleID) // Debug: Valid ID
+
+	rows, err := db.Query(`
+		SELECT 
+			b.booking_date, b.return_date
+		FROM Bookings b
+		WHERE b.vehicle_id = ?`, vehicleID)
+	if err != nil {
+		log.Printf("GetBookingsByVehicleID: Error retrieving bookings by vehicle ID: %v\n", err) // Debug: Query error
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+	log.Println("GetBookingsByVehicleID: Query executed successfully") // Debug: Query success
+
+	var bookings []struct {
+		BookingDate string `json:"booking_date"`
+		ReturnDate  string `json:"return_date"`
+	}
+
+	for rows.Next() {
+		var booking struct {
+			BookingDate string `json:"booking_date"`
+			ReturnDate  string `json:"return_date"`
+		}
+		if err := rows.Scan(&booking.BookingDate, &booking.ReturnDate); err != nil {
+			log.Printf("GetBookingsByVehicleID: Error scanning row: %v\n", err) // Debug: Scan error
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("GetBookingsByVehicleID: Retrieved booking: %+v\n", booking) // Debug: Retrieved booking
+		bookings = append(bookings, booking)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("GetBookingsByVehicleID: Row iteration error: %v\n", err) // Debug: Row error
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("GetBookingsByVehicleID: Total bookings retrieved: %d\n", len(bookings)) // Debug: Number of bookings
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(bookings); err != nil {
+		log.Printf("GetBookingsByVehicleID: Error encoding response: %v\n", err) // Debug: Encode error
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
+	log.Println("GetBookingsByVehicleID: Response sent successfully") // Debug: End of function
 }

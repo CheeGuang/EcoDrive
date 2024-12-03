@@ -1,0 +1,59 @@
+.booking-card {
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.booking-card .card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #000000;
+}
+
+.booking-card .row {
+  margin-bottom: 0.2rem; /* Reduce row spacing */
+}
+
+.booking-card p {
+  margin: 0;
+  font-size: 1rem;
+  color: #000; /* Change font colour to black */
+}
+
+.booking-card i {
+  margin-right: 10px;
+  color: #000;
+}
+
+.booking-card .button-group button {
+  width: 120px;
+  padding: 8px;
+  font-size: 1rem;
+}
+
+.booking-card .btn-warning {
+  color: white;
+  background-color: #f0ad4e;
+  border: none;
+}
+
+.booking-card .btn-warning:hover {
+  background-color: #ec971f;
+}
+
+.booking-card .btn-danger {
+  color: white;
+  background-color: #d9534f;
+  border: none;
+}
+
+.booking-card .btn-danger:hover {
+  background-color: #c9302c;
+}
+
+.btn i {
+  margin-right: 10px;
+  color: #ffffff;
+}

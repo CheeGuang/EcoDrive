@@ -9,10 +9,24 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("vehicleId").textContent = params.get("vehicle_id");
   document.getElementById("startDate").textContent = new Date(
     params.get("start_date")
-  ).toLocaleString();
+  ).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
   document.getElementById("endDate").textContent = new Date(
     params.get("end_date")
-  ).toLocaleString();
+  ).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
   document.getElementById("rentalDuration").textContent = `${params.get(
     "rental_duration"
   )} hours`;

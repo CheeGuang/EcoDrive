@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Bootstrap Link -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+      defer
+    ></script>
+
+    <!-- JQuery Link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/4f6d96e165.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Page Name -->
+    <title>EcoDrive</title>
+
+    <!-- Linking CSS -->
+    <link rel="stylesheet" href="./css/normalize.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- ######################################## INSERT PAGE'S CSS HERE \/ ########################################################### -->
+    <!-- <link rel="stylesheet" href="./css/" /> -->
+    <!-- ######################################## END OF PAGE'S CSS ########################################################### -->
+
+    <!-- Linking JS -->
+    <script src="./js/script.js" defer></script>
+
+    <!-- ######################################## INSERT PAGE'S JS HERE \/ ########################################################### -->
+    <script src="./js/modifyConfirmation.js" defer></script>
+    <!-- ######################################## END OF PAGE'S JS ########################################################### -->
+
+    <!-- Add a favicon to the tab bar -->
+    <link rel="icon" type="image/x-icon" href="./img/ecoDrive-logo.png" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <!-- Navbar -->
+      <div id="navbar-container"></div>
+    </header>
+
+    <!-- Transparent Row with Small Height at the Top -->
+    <div
+      class="row"
+      style="width: 10vw; height: 50px; background-color: transparent"
+    ></div>
+
+    <!-- Main Content Container -->
+    <div class="container text-center">
+      <div class="row justify-content-center">
+        <div class="col-12 mt-5">
+          <!-- Load customAlert.html dynamically -->
+          <div id="customAlertContainer"></div>
+
+          <!-- ######################################## INSERT PAGE'S CONTENT HERE \/ ########################################################### -->
+          <h2 class="mt-3">Booking Confirmation</h2>
+          <p class="text-muted">
+            Thank you for choosing EcoDrive! Here are your details:
+          </p>
+
+          <!-- Form-based Confirmation -->
+          <form id="checkoutForm" class="text-start">
+            <div class="card mb-3">
+              <div class="card-body">
+                <!-- Booking Details -->
+                <h5 class="card-title fw-bold">Booking Details</h5>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Booking ID</label>
+                  <p id="bookingId" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Location</label>
+                  <p id="location" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Charge Level</label>
+                  <p id="chargeLevel" class="form-control-plaintext"></p>
+                </div>
+
+                <!-- New Booking Times -->
+                <h5 class="card-title fw-bold mt-4">New Booking Times</h5>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">New Start Date/Time</label>
+                  <p id="newBookingDatetime" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">New End Date/Time</label>
+                  <p id="newReturnDatetime" class="form-control-plaintext"></p>
+                </div>
+
+                <!-- Original Booking Times -->
+                <h5 class="card-title fw-bold mt-4">Original Booking Times</h5>
+                <div class="mb-3">
+                  <label class="form-label fw-bold"
+                    >Original Start Date/Time</label
+                  >
+                  <p
+                    id="originalBookingDatetime"
+                    class="form-control-plaintext"
+                  ></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold"
+                    >Original End Date/Time</label
+                  >
+                  <p
+                    id="originalReturnDatetime"
+                    class="form-control-plaintext"
+                  ></p>
+                </div>
+
+                <!-- Pricing and Additional Details -->
+                <h5 class="card-title fw-bold mt-4">Pricing Details</h5>
+                <div class="mb-3">
+                  <label class="form-label fw-bold"
+                    >Rental Price Per Hour</label
+                  >
+                  <p id="rentalPricePerHour" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Additional Hours</label>
+                  <p id="additionalHours" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Extra Amount Paid</label>
+                  <p id="extraAmountToPay" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold"
+                    >Total Duration (Hours)</label
+                  >
+                  <p id="totalDuration" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Total Price</label>
+                  <p id="totalPrice" class="form-control-plaintext"></p>
+                </div>
+              </div>
+            </div>
+          </form>
+          <a href="./memberHome.html" class="btn btn-success mt-3">
+            <i class="fas fa-home"></i> Back to Home
+          </a>
+          <!-- ######################################## END OF PAGE'S CONTENT ########################################################### -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bd-footer">
+      <div
+        id="footer-container"
+        class="container py-4 py-md-5 px-4 px-md-3 text-body-secondary"
+      ></div>
+    </footer>
+  </body>
+</html>

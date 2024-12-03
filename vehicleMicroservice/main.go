@@ -24,6 +24,8 @@ func main() {
 	router.HandleFunc("/api/v1/vehicle/booking/{id}", booking.ModifyBooking).Methods("PUT")
 	router.HandleFunc("/api/v1/vehicle/booking/{id}", booking.CancelBooking).Methods("DELETE")
 	router.HandleFunc("/api/v1/vehicle/booking/user/{user_id}", booking.GetBookingsByUserID).Methods("GET")
+	router.HandleFunc("/api/v1/vehicle/booking/vehicle/{vehicle_id}", booking.GetBookingsByVehicleID).Methods("GET")
+
 
 
 	// Add CORS support
