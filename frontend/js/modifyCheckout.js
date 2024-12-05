@@ -1,4 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper function to decode a JWT token
+  function decodeToken(token) {
+    try {
+      const base64Payload = token.split(".")[1]; // Extract the payload part
+      const decodedPayload = atob(base64Payload); // Decode Base64
+      return JSON.parse(decodedPayload); // Parse JSON
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return null;
+    }
+  }
+
+  // Retrieve token from localStorage
+  const token = localStorage.getItem("token");
+  if (!token) {
+    showCustomAlert("User is not logged in. Redirecting to login page.");
+    window.location.href = "./login.html";
+    return;
+  }
+
+  // Decode the token to get user information
+  const decodedToken = decodeToken(token);
+  if (!decodedToken || !decodedToken.user_id) {
+    showCustomAlert("Invalid session. Please log in again.");
+    window.location.href = "./login.html";
+    return;
+  }
+
   const queryParams = new URLSearchParams(window.location.search);
 
   // Extract query parameters
@@ -158,12 +186,16 @@ document.addEventListener("DOMContentLoaded", () => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to modify booking.");
+          return response.json().then((err) => {
+            console.error("Error response:", err);
+            throw new Error(err.message || "Failed to modify booking");
+          });
         }
 
         // Construct query parameters for the modifyConfirmation page
@@ -190,19 +222,19 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error updating booking:", error);
-        alert("Failed to update booking. Please try again.");
+        showCustomAlert("Failed to update booking. Please try again.");
       });
   });
 
   // Validate full credit card details
   function validateCreditCard(cardName, cardNumber, expiryDate, cvv) {
     if (!cardName || cardName.trim() === "") {
-      alert("Cardholder name is required.");
+      showCustomAlert("Cardholder name is required.");
       return false;
     }
 
     if (!isValidCardNumber(cardNumber)) {
-      alert("Invalid credit card number.");
+      showCustomAlert("Invalid credit card number.");
       return false;
     }
 
@@ -218,12 +250,12 @@ document.addEventListener("DOMContentLoaded", () => {
       year < currentYear ||
       (year == currentYear && month < currentMonth)
     ) {
-      alert("Invalid expiry date.");
+      showCustomAlert("Invalid expiry date.");
       return false;
     }
 
     if (!/^\d{3,4}$/.test(cvv)) {
-      alert("Invalid CVV.");
+      showCustomAlert("Invalid CVV.");
       return false;
     }
 

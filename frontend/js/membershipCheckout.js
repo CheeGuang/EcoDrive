@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Redirecting to login page.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   // Map for membership plans and prices
   const membershipPlans = {
     Premium: {
@@ -182,10 +199,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Send payment data to server
-    fetch("http://localhost:5200/api/v1/membership/payment", {
+    authenticatedFetch("http://localhost:5200/api/v1/membership/payment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     })

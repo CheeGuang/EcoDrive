@@ -3,36 +3,80 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"vehicleMicroservice/booking"
 	"vehicleMicroservice/vehicle"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
+
+// Authentication middleware to validate JWT
+func authenticateMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Extract token
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+		// Get the JWT secret from the environment variable
+		secretKey := os.Getenv("JWT_SECRET")
+		if secretKey == "" {
+			log.Println("JWT_SECRET is not set in the environment")
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// Parse and validate the token
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, http.ErrAbortHandler
+			}
+			return []byte(secretKey), nil
+		})
+
+		if err != nil || !token.Valid {
+			log.Printf("Invalid JWT token: %v", err)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Proceed to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	// Initialize the router
 	router := mux.NewRouter()
 
+	// JWT Authentication Logic
+	authenticated := router.NewRoute().Subrouter()
+	authenticated.Use(authenticateMiddleware)
+
 	// Vehicle endpoints
-	router.HandleFunc("/api/v1/vehicle/availability", vehicle.GetAvailableVehicles).Methods("GET")
-	router.HandleFunc("/api/v1/vehicle/status", vehicle.GetVehicleStatus).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/availability", vehicle.GetAvailableVehicles).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/status", vehicle.GetVehicleStatus).Methods("GET")
 
 	// Booking endpoints
-	router.HandleFunc("/api/v1/vehicle/booking", booking.CreateBooking).Methods("POST")
-	router.HandleFunc("/api/v1/vehicle/booking/{id}", booking.GetBooking).Methods("GET")
-	router.HandleFunc("/api/v1/vehicle/booking/{id}", booking.ModifyBooking).Methods("PUT")
-	router.HandleFunc("/api/v1/vehicle/booking/{id}", booking.CancelBooking).Methods("DELETE")
-	router.HandleFunc("/api/v1/vehicle/booking/user/{user_id}", booking.GetBookingsByUserID).Methods("GET")
-	router.HandleFunc("/api/v1/vehicle/booking/vehicle/{vehicle_id}", booking.GetBookingsByVehicleID).Methods("GET")
-
-
+	authenticated.HandleFunc("/api/v1/vehicle/booking", booking.CreateBooking).Methods("POST")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/{id}", booking.GetBooking).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/{id}", booking.ModifyBooking).Methods("PUT")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/{id}", booking.CancelBooking).Methods("DELETE")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/user/{user_id}", booking.GetBookingsByUserID).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/vehicle/{vehicle_id}", booking.GetBookingsByVehicleID).Methods("GET")
 
 	// Add CORS support
 	corsHandler := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://127.0.0.1:5150"}), // Allowed origins
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}), // Allowed methods
-		handlers.AllowedHeaders([]string{"Content-Type"}), // Allowed headers
+		handlers.AllowedOrigins([]string{"http://127.0.0.1:5150"}), // Update for allowed origins
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}), // Update for allowed HTTP methods
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}), // Include Authorization header
 	)(router)
 
 	// Start the server

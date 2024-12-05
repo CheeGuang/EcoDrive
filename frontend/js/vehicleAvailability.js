@@ -1,6 +1,23 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const searchButton = document.getElementById("searchButton");
 
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Please log in.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   try {
     // Get the user ID from the token in localStorage
     const token = localStorage.getItem("token"); // Replace with actual token key
@@ -16,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Fetch membership status
-    const membershipResponse = await fetch(
+    const membershipResponse = await authenticatedFetch(
       `http://localhost:5100/api/v1/user/membership/status?user_id=${encodeURIComponent(
         userId
       )}`
@@ -29,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { membership_level } = await membershipResponse.json();
 
     // Fetch active bookings for the user
-    const bookingResponse = await fetch(
+    const bookingResponse = await authenticatedFetch(
       `http://localhost:5150/api/v1/vehicle/booking/user/${userId}`
     );
 
@@ -127,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Validate the selected date range based on membership level
-      const membershipResponse = await fetch(
+      const membershipResponse = await authenticatedFetch(
         `http://localhost:5100/api/v1/user/membership/status?user_id=${encodeURIComponent(
           userId
         )}`
@@ -169,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Fetch available vehicles
-      fetch(
+      authenticatedFetch(
         `http://localhost:5150/api/v1/vehicle/availability?start_date=${encodeURIComponent(
           startDate
         )}&end_date=${encodeURIComponent(endDate)}`

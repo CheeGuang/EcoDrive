@@ -72,7 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
       "http://localhost:5050/api/v1/authentication/register-user",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           email,
           verification_code: verificationCode,

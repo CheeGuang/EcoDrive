@@ -108,6 +108,12 @@ func ModifyBooking(w http.ResponseWriter, r *http.Request) {
 		TotalPrice    float64 `json:"total_price"`
 	}
 
+	if payload.StartDateTime == "" || payload.EndDateTime == "" || payload.TotalPrice <= 0 {
+		log.Printf("Invalid input data: %+v", payload)
+		http.Error(w, "Missing or invalid fields in the input", http.StatusBadRequest)
+		return
+	}
+
 	// Decode and validate payload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)

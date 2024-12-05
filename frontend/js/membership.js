@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Redirecting to login page.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   // Function to decode a JWT
   function decodeToken(token) {
     try {
@@ -37,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     )}`;
 
     try {
-      const response = await fetch(apiURL);
+      const response = await authenticatedFetch(apiURL);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

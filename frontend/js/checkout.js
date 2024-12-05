@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Redirecting to login page.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   // Helper function to decode a JWT token
   function decodeToken(token) {
     try {
@@ -71,7 +88,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ).toFixed(2)}`;
 
   // Fetch membership level
-  fetch(`http://localhost:5100/api/v1/user/profile?user_id=${userId}`)
+  authenticatedFetch(
+    `http://localhost:5100/api/v1/user/profile?user_id=${userId}`
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to fetch user details");
@@ -83,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("membershipLevel").textContent = membershipLevel;
 
       // Fetch discount using the membership level
-      fetch(
+      authenticatedFetch(
         `http://localhost:5200/api/v1/payment/real-time-bill?membership_level=${membershipLevel}&duration_hours=${rentalDuration}&price_per_hour=${pricePerHour}`
       )
         .then((response) => {
@@ -190,7 +209,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fetch("http://localhost:5200/api/v1/payment/process", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(payload),
     })
       .then((response) => {

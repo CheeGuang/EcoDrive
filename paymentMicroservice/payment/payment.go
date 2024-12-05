@@ -157,6 +157,14 @@ func ProcessPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract the Authorization token from the incoming request
+	authToken := r.Header.Get("Authorization")
+	if authToken == "" {
+		log.Println("Authorization token missing in request")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	// Notify booking service
 	apiURL := "http://vehicle:5150/api/v1/vehicle/booking"
 	bookingPayload := map[string]interface{}{
@@ -173,8 +181,11 @@ func ProcessPayment(w http.ResponseWriter, r *http.Request) {
 	jsonPayload, _ := json.Marshal(bookingPayload)
 	log.Printf("Serialized JSON payload: %s", string(jsonPayload))
 
+	// Forward the token to the booking API
 	req, _ := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonPayload))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authToken)
+
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -474,6 +485,15 @@ func ProcessMembershipPayment(w http.ResponseWriter, r *http.Request) {
 
 	// Step 2: Call API to update the user's membership level
 	log.Println("[DEBUG] Updating user membership level via API")
+
+	// Extract the Authorization token from the incoming request
+	authToken := r.Header.Get("Authorization")
+	if authToken == "" {
+		log.Println("Authorization token missing in request")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	apiURL := "http://user:5100/api/v1/user/membership/update"
 	payload := map[string]interface{}{
 		"user_id":         payment.UserID,
@@ -484,6 +504,7 @@ func ProcessMembershipPayment(w http.ResponseWriter, r *http.Request) {
 
 	req, _ := http.NewRequest("PUT", apiURL, bytes.NewBuffer(jsonPayload))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Redirecting to login page.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   const activeBookingList = document.getElementById("activeBookingList");
   const pastBookingList = document.getElementById("pastBookingList");
 
@@ -32,7 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const userId = decodedToken.user_id;
 
   // Fetch bookings for the user
-  fetch(`http://localhost:5150/api/v1/vehicle/booking/user/${userId}`)
+  authenticatedFetch(
+    `http://localhost:5150/api/v1/vehicle/booking/user/${userId}`
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to fetch bookings.");
@@ -232,7 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ) {
     console.log("Fetching unavailable timeslots for vehicle ID:", vehicleId);
 
-    fetch(`http://localhost:5150/api/v1/vehicle/booking/vehicle/${vehicleId}`)
+    authenticatedFetch(
+      `http://localhost:5150/api/v1/vehicle/booking/vehicle/${vehicleId}`
+    )
       .then((response) => {
         console.log("Received response status:", response.status);
         if (!response.ok) {
@@ -463,7 +484,9 @@ document.addEventListener("DOMContentLoaded", () => {
       additionalHours > 0 ? additionalHours * rentalPricePerHour : 0;
 
     // Validation 3: Check for time slot overlap
-    fetch(`http://localhost:5150/api/v1/vehicle/booking/vehicle/${vehicleId}`)
+    authenticatedFetch(
+      `http://localhost:5150/api/v1/vehicle/booking/vehicle/${vehicleId}`
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to validate timeslots.");
@@ -534,6 +557,10 @@ function cancelBooking(bookingId) {
 
   fetch(`http://localhost:5150/api/v1/vehicle/booking/${bookingId}`, {
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
   })
     .then((response) => {
       if (!response.ok) {

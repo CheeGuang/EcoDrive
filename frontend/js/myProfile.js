@@ -4,6 +4,23 @@ document.addEventListener("DOMContentLoaded", function () {
   const editButton = document.getElementById("editButton");
   const saveButton = document.getElementById("saveButton");
 
+  // Helper function to add token to fetch requests
+  async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showCustomAlert("User is not authenticated. Redirecting to login page.");
+      window.location.href = "./login.html";
+      throw new Error("User is not authenticated");
+    }
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   // Decode the JWT to extract user information
   function getUserIdFromToken() {
     const token = localStorage.getItem("token");
@@ -32,11 +49,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      const response = await fetch(`${apiUrl}/profile?user_id=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(
+        `${apiUrl}/profile?user_id=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch profile data.");
