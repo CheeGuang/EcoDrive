@@ -166,3 +166,117 @@ func GetVehicleStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Vehicle status response sent successfully.")
 }
+
+// UpdateVehicleDetails updates cleanliness status, charge level, and location of a vehicle,
+// and optionally updates the booking status to "active".
+func UpdateVehicleDetails(w http.ResponseWriter, r *http.Request) {
+	log.Println("Starting UpdateVehicleDetails function...")
+
+	// Check the HTTP method
+	if r.Method != http.MethodPut {
+		log.Println("Invalid HTTP method. Only PUT is allowed.")
+		http.Error(w, "Invalid request method. Use PUT.", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse the JSON request body
+	var updateRequest struct {
+		VehicleID         int     `json:"vehicle_id"`
+		CleanlinessStatus string  `json:"cleanliness_status,omitempty"`
+		ChargeLevel       *int64  `json:"charge_level,omitempty"`
+		Location          string  `json:"location,omitempty"`
+		BookingID         *int    `json:"booking_id,omitempty"` // Optional booking ID for updating status
+	}
+	log.Println("Parsing request body...")
+	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
+		log.Printf("Error decoding JSON payload: %v", err)
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	log.Printf("Parsed request: %+v", updateRequest)
+
+	// Validate required fields
+	if updateRequest.VehicleID == 0 {
+		log.Println("Vehicle ID is missing in the request payload.")
+		http.Error(w, "Vehicle ID is required", http.StatusBadRequest)
+		return
+	}
+
+	// Prepare the SQL query dynamically based on provided fields
+	query := "UPDATE Vehicles SET "
+	var args []interface{}
+	if updateRequest.CleanlinessStatus != "" {
+		log.Printf("Adding cleanliness_status to update query: %s", updateRequest.CleanlinessStatus)
+		query += "cleanliness_status = ?, "
+		args = append(args, updateRequest.CleanlinessStatus)
+	}
+	if updateRequest.ChargeLevel != nil {
+		log.Printf("Adding charge_level to update query: %d", *updateRequest.ChargeLevel)
+		query += "charge_level = ?, "
+		args = append(args, *updateRequest.ChargeLevel)
+	}
+	if updateRequest.Location != "" {
+		log.Printf("Adding location to update query: %s", updateRequest.Location)
+		query += "location = ?, "
+		args = append(args, updateRequest.Location)
+	}
+	// Remove trailing comma and space
+	query = query[:len(query)-2]
+	query += " WHERE vehicle_id = ?"
+	args = append(args, updateRequest.VehicleID)
+
+	log.Printf("Generated query for vehicle update: %s", query)
+	log.Printf("Query arguments: %+v", args)
+
+	// Execute the query to update the vehicle
+	log.Println("Executing vehicle update query...")
+	result, err := db.Exec(query, args...)
+	if err != nil {
+		log.Printf("Error executing vehicle update query: %v", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Check how many rows were affected
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error fetching rows affected: %v", err)
+		http.Error(w, "Error fetching update result", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Rows affected by vehicle update: %d", rowsAffected)
+	if rowsAffected == 0 {
+		log.Printf("No rows updated for vehicle_id: %d", updateRequest.VehicleID)
+		http.Error(w, "Vehicle not found or no changes made", http.StatusNotFound)
+		return
+	}
+
+	// If a BookingID is provided, update the booking status to "active"
+	if updateRequest.BookingID != nil {
+		log.Printf("Updating booking status to 'active' for booking_id: %d", *updateRequest.BookingID)
+		_, err := db.Exec(`
+			UPDATE Bookings 
+			SET status = 'active' 
+			WHERE booking_id = ?`, *updateRequest.BookingID)
+		if err != nil {
+			log.Printf("Error updating booking status: %v", err)
+			http.Error(w, "Database error while updating booking status", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Booking status successfully updated to 'active' for booking_id: %d", *updateRequest.BookingID)
+	} else {
+		log.Println("No booking_id provided. Skipping booking status update.")
+	}
+
+	// Send success response
+	log.Println("Sending success response...")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Vehicle details and booking status updated successfully",
+	})
+
+	log.Println("UpdateVehicleDetails function completed.")
+}

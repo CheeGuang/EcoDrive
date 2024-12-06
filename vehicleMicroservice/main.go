@@ -63,6 +63,7 @@ func main() {
 	// Vehicle endpoints
 	authenticated.HandleFunc("/api/v1/vehicle/availability", vehicle.GetAvailableVehicles).Methods("GET")
 	authenticated.HandleFunc("/api/v1/vehicle/status", vehicle.GetVehicleStatus).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/update", vehicle.UpdateVehicleDetails).Methods("PUT") 
 
 	// Booking endpoints
 	authenticated.HandleFunc("/api/v1/vehicle/booking", booking.CreateBooking).Methods("POST")
@@ -71,6 +72,7 @@ func main() {
 	authenticated.HandleFunc("/api/v1/vehicle/booking/{id}", booking.CancelBooking).Methods("DELETE")
 	authenticated.HandleFunc("/api/v1/vehicle/booking/user/{user_id}", booking.GetBookingsByUserID).Methods("GET")
 	authenticated.HandleFunc("/api/v1/vehicle/booking/vehicle/{vehicle_id}", booking.GetBookingsByVehicleID).Methods("GET")
+	authenticated.HandleFunc("/api/v1/vehicle/booking/end/{id}", booking.EndBooking).Methods("PUT") // Added EndBooking endpoint
 
 	// Add CORS support
 	corsHandler := handlers.CORS(

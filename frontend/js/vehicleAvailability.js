@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const activeBookings = activeBookingsData.filter((booking) => {
         const returnDate = new Date(booking.return_date);
         const today = new Date();
-        return returnDate > today;
+        return returnDate > today && booking.status != "Completed";
       });
 
       // Define booking limits based on membership level
@@ -229,10 +229,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         Location: ${
                           vehicle.location
                         } <a href="${googleMapsUrl}" target="_blank" class="text-primary">View in Google Maps</a> <br />
-                        Cleanliness Status: $${
-                          vehicle.cleanliness_status
-                        } <br />
-                        Rental Price per Hour: ${vehicle.rental_price_per_hour.toFixed(
+                        Cleanliness Status: ${vehicle.cleanliness_status} <br />
+                        Rental Price per Hour: $${vehicle.rental_price_per_hour.toFixed(
                           2
                         )} <br />
                         Total Rental Price (for ${rentalDurationHours} ${

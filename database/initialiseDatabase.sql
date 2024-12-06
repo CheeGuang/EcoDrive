@@ -108,6 +108,7 @@ CREATE TABLE Bookings (
     booking_date DATETIME NOT NULL,                                   -- Date and time of booking
     return_date DATETIME NOT NULL,                                    -- Date and time of return
     total_price DECIMAL(10, 2) NOT NULL,                              -- Total price of the booking
+    status ENUM('Pending', 'Active', 'Completed') DEFAULT 'Pending' NOT NULL, -- Booking status
     FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),         -- Foreign key relationship
     INDEX idx_user_booking_date (user_id, booking_date)               -- Composite index for user and booking date
 );
@@ -121,10 +122,10 @@ INSERT INTO Vehicles (model, location, charge_level, cleanliness_status, rental_
 ("Ford Mustang", "Suntec City Carpark F", 70, "Needs Cleaning", 40.00);
 
 -- Insert example data into the Bookings table
-INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price) VALUES
-(1, 1, '2025-01-01 10:00:00', '2025-01-05 14:00:00', 100.00),
-(1, 1, '2024-06-01 10:00:00', '2024-06-05 14:00:00', 100.00),
-(1, 1, '2024-01-01 10:00:00', '2024-01-05 14:00:00', 100.00);
+INSERT INTO Bookings (vehicle_id, user_id, booking_date, return_date, total_price, status) VALUES
+(1, 1, '2025-01-01 10:00:00', '2025-01-05 14:00:00', 100.00, 'Pending'),
+(1, 1, '2024-06-01 10:00:00', '2024-06-05 14:00:00', 100.00, 'Completed'),
+(1, 1, '2024-01-01 10:00:00', '2024-01-05 14:00:00', 100.00, 'Completed');
 
 
 -- **************************************************

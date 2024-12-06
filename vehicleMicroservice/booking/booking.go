@@ -235,8 +235,8 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query(`
 		SELECT 
 			b.booking_id, b.vehicle_id, b.user_id, 
-			b.booking_date, b.return_date, b.total_price,
-			v.model, v.location, v.charge_level, v.rental_price_per_hour
+			b.booking_date, b.return_date, b.total_price, b.status,
+			v.model, v.location, v.charge_level, v.rental_price_per_hour, v.cleanliness_status
 		FROM Bookings b
 		JOIN Vehicles v ON b.vehicle_id = v.vehicle_id
 		WHERE b.user_id = ?`, userID)
@@ -249,16 +249,18 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetBookingsByUserID: Query executed successfully") // Debug: Query success
 
 	var bookings []struct {
-		BookingID         int     `json:"booking_id"`
-		VehicleID         int     `json:"vehicle_id"`
-		UserID            int     `json:"user_id"`
-		BookingDate       string  `json:"booking_date"`
-		ReturnDate        string  `json:"return_date"`
-		TotalPrice        float64 `json:"total_price"`
-		Model             string  `json:"model"`
-		Location          string  `json:"location"`
-		ChargeLevel       int     `json:"charge_level"`
-		RentalPricePerHour float64 `json:"rental_price_per_hour"`
+		BookingID           int     `json:"booking_id"`
+		VehicleID           int     `json:"vehicle_id"`
+		UserID              int     `json:"user_id"`
+		BookingDate         string  `json:"booking_date"`
+		ReturnDate          string  `json:"return_date"`
+		TotalPrice          float64 `json:"total_price"`
+		Status              string  `json:"status"`
+		Model               string  `json:"model"`
+		Location            string  `json:"location"`
+		ChargeLevel         int     `json:"charge_level"`
+		RentalPricePerHour  float64 `json:"rental_price_per_hour"`
+		CleanlinessStatus   string  `json:"cleanliness_status"`
 	}
 
 	for rows.Next() {
@@ -269,10 +271,12 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 			BookingDate       string  `json:"booking_date"`
 			ReturnDate        string  `json:"return_date"`
 			TotalPrice        float64 `json:"total_price"`
+			Status            string  `json:"status"`
 			Model             string  `json:"model"`
 			Location          string  `json:"location"`
 			ChargeLevel       int     `json:"charge_level"`
 			RentalPricePerHour float64 `json:"rental_price_per_hour"`
+			CleanlinessStatus  string  `json:"cleanliness_status"`
 		}
 		if err := rows.Scan(
 			&booking.BookingID,
@@ -281,10 +285,12 @@ func GetBookingsByUserID(w http.ResponseWriter, r *http.Request) {
 			&booking.BookingDate,
 			&booking.ReturnDate,
 			&booking.TotalPrice,
+			&booking.Status,
 			&booking.Model,
 			&booking.Location,
 			&booking.ChargeLevel,
 			&booking.RentalPricePerHour,
+			&booking.CleanlinessStatus,
 		); err != nil {
 			log.Printf("GetBookingsByUserID: Error scanning row: %v\n", err) // Debug: Scan error
 			http.Error(w, "Database error", http.StatusInternalServerError)
@@ -371,4 +377,104 @@ func GetBookingsByVehicleID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("GetBookingsByVehicleID: Response sent successfully") // Debug: End of function
+}
+
+// EndBooking marks a booking as completed and updates the vehicle details
+func EndBooking(w http.ResponseWriter, r *http.Request) {
+	log.Println("EndBooking: Start processing request") // Debug: Start of function
+
+	// Extract booking ID from URL parameters
+	params := mux.Vars(r)
+	bookingID, err := strconv.Atoi(params["id"])
+	if err != nil {
+		log.Printf("EndBooking: Invalid booking ID: %v\n", params["id"]) // Debug: Invalid ID
+		http.Error(w, "Invalid booking ID", http.StatusBadRequest)
+		return
+	}
+
+	// Parse request payload
+	var payload struct {
+		ChargeLevel       int    `json:"charge_level"`
+		CleanlinessStatus string `json:"cleanliness_status"`
+		Location          string `json:"location"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		log.Printf("EndBooking: Invalid input: %v\n", err) // Debug: Decode error
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Validate input data
+	if payload.ChargeLevel < 0 || payload.ChargeLevel > 100 {
+		http.Error(w, "Charge level must be between 0 and 100", http.StatusBadRequest)
+		return
+	}
+
+	if payload.CleanlinessStatus != "Clean" && payload.CleanlinessStatus != "Needs Cleaning" {
+		http.Error(w, "Invalid cleanliness status", http.StatusBadRequest)
+		return
+	}
+
+	if payload.Location == "" {
+		http.Error(w, "Location cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	// Start a database transaction
+	tx, err := db.Begin()
+	if err != nil {
+		log.Printf("EndBooking: Error starting transaction: %v\n", err) // Debug: Transaction error
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Update booking status to "completed"
+	_, err = tx.Exec(`
+		UPDATE Bookings 
+		SET status = 'completed' 
+		WHERE booking_id = ?`, bookingID)
+	if err != nil {
+		log.Printf("EndBooking: Error updating booking status: %v\n", err) // Debug: Booking update error
+		tx.Rollback()
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get vehicle ID associated with the booking
+	var vehicleID int
+	err = tx.QueryRow(`
+		SELECT vehicle_id 
+		FROM Bookings 
+		WHERE booking_id = ?`, bookingID).Scan(&vehicleID)
+	if err != nil {
+		log.Printf("EndBooking: Error fetching vehicle ID: %v\n", err) // Debug: Vehicle ID error
+		tx.Rollback()
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Update vehicle details
+	_, err = tx.Exec(`
+		UPDATE Vehicles 
+		SET charge_level = ?, cleanliness_status = ?, location = ?
+		WHERE vehicle_id = ?`,
+		payload.ChargeLevel, payload.CleanlinessStatus, payload.Location, vehicleID)
+	if err != nil {
+		log.Printf("EndBooking: Error updating vehicle details: %v\n", err) // Debug: Vehicle update error
+		tx.Rollback()
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		log.Printf("EndBooking: Error committing transaction: %v\n", err) // Debug: Commit error
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("EndBooking: Successfully completed booking and updated vehicle") // Debug: Success
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Booking ended successfully"))
 }
