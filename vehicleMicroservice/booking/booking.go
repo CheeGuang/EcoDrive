@@ -1,11 +1,13 @@
 package booking
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"os"
 	"strconv"
 
@@ -140,6 +142,17 @@ func ModifyBooking(w http.ResponseWriter, r *http.Request) {
 
 // CancelBooking allows users to cancel an existing booking
 func CancelBooking(w http.ResponseWriter, r *http.Request) {
+	// Parse request body to get the user's email
+	var requestData struct {
+		Email string `json:"email"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&requestData)
+	if err != nil || requestData.Email == "" {
+		http.Error(w, "Invalid request body or missing email", http.StatusBadRequest)
+		return
+	}
+
+	// Get booking ID from URL parameters
 	params := mux.Vars(r)
 	bookingID, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -147,6 +160,7 @@ func CancelBooking(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Delete the booking from the database
 	_, err = db.Exec("DELETE FROM Bookings WHERE booking_id = ?", bookingID)
 	if err != nil {
 		log.Printf("Error deleting booking: %v", err)
@@ -154,9 +168,75 @@ func CancelBooking(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send acknowledgment email
+	subject := "EcoDrive Booking Cancellation Confirmation"
+	body := fmt.Sprintf(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Booking Cancellation</title>
+        </head>
+        <body>
+            <p>Dear Valued Customer,</p>
+            <p>We are writing to confirm that your booking with ID <strong>%d</strong> has been successfully canceled.</p>
+            <p>If you have already made a payment for this booking, a refund will be processed to your original payment method within <strong>3 working days</strong>.</p>
+            <p>We apologise for any inconvenience caused and look forward to serving you again in the future. If you have any questions or require further assistance, please do not hesitate to contact us.</p>
+            <p>Thank you for choosing EcoDrive.</p>
+            <p>Best regards,<br>The EcoDrive Team</p>
+        </body>
+        </html>
+    `, bookingID)
+
+	err = sendEmailWithoutAttachment(requestData.Email, subject, body)
+	if err != nil {
+		log.Printf("Error sending cancellation email: %v", err)
+		http.Error(w, "Failed to send email acknowledgment", http.StatusInternalServerError)
+		return
+	}
+
+	// Send success response
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Booking cancelled successfully"))
+	w.Write([]byte("Booking cancelled successfully, acknowledgment email sent"))
 }
+
+// sendEmailWithoutAttachment sends an email without any attachment
+func sendEmailWithoutAttachment(to, subject, body string) error {
+	// SMTP configuration
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+	smtpUser := os.Getenv("SMTP_USER")
+	smtpPassword := os.Getenv("SMTP_PASSWORD")
+
+	// Validate SMTP credentials
+	if smtpUser == "" || smtpPassword == "" {
+		return fmt.Errorf("SMTP credentials are missing")
+	}
+
+	// Configure email sender
+	from := "EcoDrive <" + smtpUser + ">"
+
+	// Build email headers and content
+	message := bytes.NewBuffer(nil)
+	message.WriteString(fmt.Sprintf("From: %s\r\n", from))
+	message.WriteString(fmt.Sprintf("To: %s\r\n", to))
+	message.WriteString(fmt.Sprintf("Subject: %s\r\n", subject))
+	message.WriteString("MIME-Version: 1.0\r\n")
+	message.WriteString("Content-Type: text/html; charset=UTF-8\r\n\r\n")
+	message.WriteString(body)
+
+	// Send the email
+	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUser, []string{to}, message.Bytes())
+	if err != nil {
+		return fmt.Errorf("failed to send email: %v", err)
+	}
+
+	log.Printf("Email sent successfully to %s", to)
+	return nil
+}
+
 
 
 // GetBooking retrieves details of a specific booking

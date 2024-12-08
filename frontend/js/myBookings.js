@@ -747,19 +747,38 @@ function cancelBooking(bookingId) {
     return;
   }
 
+  // Get the token from localStorage
+  const token = localStorage.getItem("token");
+  if (!token) {
+    showCustomAlert("Authentication token is missing.");
+    return;
+  }
+
+  // Decode the token to extract the email
+  const tokenPayload = JSON.parse(atob(token.split(".")[1]));
+  const email = tokenPayload.email; // Assuming the email field exists in the token payload
+  if (!email) {
+    showCustomAlert("Email information is missing in the token.");
+    return;
+  }
+
+  // Make the DELETE request with the email in the body
   fetch(`http://localhost:5150/api/v1/vehicle/booking/${bookingId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({ email }), // Pass the email in the request body
   })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to cancel the booking.");
       }
-      showCustomAlert("Booking cancelled successfully.");
-      window.location.reload(); // Refresh the page to update the booking list
+      showCustomAlert(
+        "Booking cancelled successfully. A confirmation email has been sent, and the refund will be processed within 3 working days.",
+        "../myBookings.html"
+      );
     })
     .catch((error) => {
       console.error(error);
