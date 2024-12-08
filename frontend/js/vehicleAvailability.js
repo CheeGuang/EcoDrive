@@ -222,28 +222,53 @@ document.addEventListener("DOMContentLoaded", async () => {
             )}`;
 
             const vehicleCard = `
-                  <div class="card mb-3">
-                    <div class="card-body">
-                      <h5 class="card-title">${vehicle.model}</h5>
-                      <p class="card-text">
-                        Location: ${
-                          vehicle.location
-                        } <a href="${googleMapsUrl}" target="_blank" class="text-primary">View in Google Maps</a> <br />
-                        Cleanliness Status: ${vehicle.cleanliness_status} <br />
-                        Rental Price per Hour: $${vehicle.rental_price_per_hour.toFixed(
-                          2
-                        )} <br />
-                        Total Rental Price (for ${rentalDurationHours} ${
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row">
+                  <!-- Column 1: Vehicle Details -->
+                  <div class="col-md-6">
+                    <h5 class="card-title">${vehicle.model}</h5>
+                    <p class="card-text">
+                      <i class="fas fa-map-marker-alt"></i> Location: ${
+                        vehicle.location
+                      } 
+                      <a href="https://www.google.com/maps?q=${encodeURIComponent(
+                        vehicle.location
+                      )}" target="_blank" class="text-primary">View in Google Maps</a> <br />
+                      <i class="fas fa-shower"></i> Cleanliness Status: ${
+                        vehicle.cleanliness_status
+                      } <br />
+                      <i class="fas fa-dollar-sign"></i> Rental Price per Hour: $${vehicle.rental_price_per_hour.toFixed(
+                        2
+                      )} <br />
+                      <i class="fas fa-clock"></i> Total Rental Price (for ${rentalDurationHours} ${
               rentalDurationHours > 1 ? "hours" : "hour"
             }): $${totalPrice.toFixed(2)}
-                      </p>
-                      <button class="btn btn-primary" onclick="makeBooking(${
-                        vehicle.vehicle_id
-                      }, '${startDate}', '${endDate}', ${vehicle.rental_price_per_hour.toFixed(
+                    </p>
+                    <button class="btn btn-primary" onclick="makeBooking(${
+                      vehicle.vehicle_id
+                    }, '${startDate}', '${endDate}', ${vehicle.rental_price_per_hour.toFixed(
               2
             )})">Book Now</button>
+                  </div>
+                  <!-- Column 2: Google Map -->
+                  <div class="col-md-6">
+                    <div div class="google-map" style="height:100%">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        style="border:0"
+                        src="https://www.google.com/maps?q=${encodeURIComponent(
+                          vehicle.location
+                        )}&output=embed"
+                        allowfullscreen
+                      ></iframe>
                     </div>
-                  </div>`;
+                  </div>
+                </div>
+              </div>
+            </div>`;
             vehicleList.innerHTML += vehicleCard;
           });
         })

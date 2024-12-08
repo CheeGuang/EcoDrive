@@ -93,12 +93,11 @@ func CreateBooking(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// ModifyBooking allows users to modify an existing booking
 func ModifyBooking(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	bookingID, err := strconv.Atoi(params["id"])
 	if err != nil {
-		http.Error(w, "Invalid booking ID", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid booking ID"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -108,20 +107,15 @@ func ModifyBooking(w http.ResponseWriter, r *http.Request) {
 		TotalPrice    float64 `json:"total_price"`
 	}
 
-	if payload.StartDateTime == "" || payload.EndDateTime == "" || payload.TotalPrice <= 0 {
-		log.Printf("Invalid input data: %+v", payload)
-		http.Error(w, "Missing or invalid fields in the input", http.StatusBadRequest)
-		return
-	}
-
-	// Decode and validate payload
+	// Decode JSON payload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid input. Ensure JSON is properly formatted."}`, http.StatusBadRequest)
 		return
 	}
 
+	// Validate decoded payload
 	if payload.StartDateTime == "" || payload.EndDateTime == "" || payload.TotalPrice <= 0 {
-		http.Error(w, "Missing or invalid fields in the input", http.StatusBadRequest)
+		http.Error(w, `{"error": "Missing or invalid fields in the input"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -133,13 +127,15 @@ func ModifyBooking(w http.ResponseWriter, r *http.Request) {
 		payload.StartDateTime, payload.EndDateTime, payload.TotalPrice, bookingID)
 	if err != nil {
 		log.Printf("Error updating booking: %v", err)
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		http.Error(w, `{"error": "Database error"}`, http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Booking updated successfully"))
+	w.Write([]byte(`{"message": "Booking updated successfully"}`))
 }
+
 
 
 // CancelBooking allows users to cancel an existing booking

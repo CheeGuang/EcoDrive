@@ -121,132 +121,146 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const bookingCard = `
             <div class="card mb-3 booking-card shadow">
-              <div class="card-body">
-                <h5 class="card-title text-center">
-                  <i class="fas fa-car"></i> ${booking.model}
-                </h5>
-                <p class="card-text">
-                  <i class="fas fa-id-badge"></i> Booking ID: ${
-                    booking.booking_id
-                  } <br />
-                  <i class="fas fa-car"></i> Vehicle ID: ${
-                    booking.vehicle_id
-                  } <br />
-                  <i class="fas fa-calendar-alt"></i> Start Date: ${startDate.toLocaleString(
-                    "en-US",
-                    {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    }
-                  )} <br />
-                  <i class="fas fa-calendar-alt"></i> End Date: ${endDate.toLocaleString(
-                    "en-US",
-                    {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    }
-                  )} <br />
-                  <i class="fas fa-map-marker-alt"></i> Location: ${
-                    booking.location
-                  } <br />
-                  <i class="fas fa-battery-half"></i> Charge Level: ${
-                    booking.charge_level
-                  }% <br />
-                  <i class="fas fa-shower"></i> Cleanliness Status: ${
-                    booking.cleanliness_status
-                  } <br />
-                  <i class="fas fa-dollar-sign"></i> Rental Price per Hour: $${booking.rental_price_per_hour.toFixed(
-                    2
-                  )} <br />
-                  <i class="fas fa-clock"></i> Total Duration: ${durationInHours} hour(s) <br />
-                  <i class="fas fa-money-check-alt"></i> Total Price: $${totalPrice.toFixed(
-                    2
-                  )}
-                </p>  
-                <div class="button-group text-center mt-3">
-                  ${
-                    booking.status === "Pending" && timeDiffInMinutes <= 60
-                      ? `<button class="btn btn-success me-2" onclick="startTrip(${
-                          booking.booking_id
-                        }, ${booking.vehicle_id}, '${startDate.toLocaleString(
-                          "en-US",
-                          {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          }
-                        )}', '${endDate.toLocaleString("en-US", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}', '${booking.location}', ${
-                          booking.charge_level
-                        }, '${booking.cleanliness_status}', ${
-                          booking.rental_price_per_hour
-                        }, ${durationInHours}, ${totalPrice})">
-                      <i class="fas fa-play"></i> Start Trip
-                    </button>`
-                      : booking.status === "Active"
-                      ? `<button class="btn btn-primary me-2" onclick="viewTripDetails(
-                          ${booking.booking_id}, 
-                          '${booking.vehicle_id}', 
-                          '${startDate.toLocaleString("en-US", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}', 
-                          '${endDate.toLocaleString("en-US", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}', 
-                          '${booking.location}', 
-                          ${booking.charge_level}, 
-                          '${booking.cleanliness_status}', 
-                          ${booking.rental_price_per_hour}, 
-                          ${durationInHours}, 
-                          ${totalPrice}
-                        )">
-                      <i class="fas fa-info-circle"></i> Trip Details
-                    </button>
-                    `
-                      : ""
-                  }
-                  <button class="btn btn-warning me-2" onclick="openModifyModal(${
-                    booking.booking_id
-                  }, '${booking.booking_date}', '${booking.return_date}', ${
+  <div class="card-body">
+    <div class="row">
+      <!-- Column 1: Booking Details -->
+      <div class="col-md-6">
+        <h5 class="card-title text-center">
+          <i class="fas fa-car"></i> ${booking.model}
+        </h5>
+        <p class="card-text">
+          <i class="fas fa-id-badge"></i> Booking ID: ${
+            booking.booking_id
+          } <br />
+          <i class="fas fa-car"></i> Vehicle ID: ${booking.vehicle_id} <br />
+          <i class="fas fa-calendar-alt"></i> Start Date: ${startDate.toLocaleString(
+            "en-US",
+            {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }
+          )} <br />
+          <i class="fas fa-calendar-alt"></i> End Date: ${endDate.toLocaleString(
+            "en-US",
+            {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }
+          )} <br />
+          <i class="fas fa-map-marker-alt"></i> Location: ${
+            booking.location
+          } <br />
+          <i class="fas fa-battery-half"></i> Charge Level: ${
+            booking.charge_level
+          }% <br />
+          <i class="fas fa-shower"></i> Cleanliness Status: ${
+            booking.cleanliness_status
+          } <br />
+          <i class="fas fa-dollar-sign"></i> Rental Price per Hour: $${booking.rental_price_per_hour.toFixed(
+            2
+          )} <br />
+          <i class="fas fa-clock"></i> Total Duration: ${durationInHours} hour(s) <br />
+          <i class="fas fa-money-check-alt"></i> Total Price: $${totalPrice.toFixed(
+            2
+          )}
+        </p>
+        <div class="button-group text-center mt-3">
+          ${
+            booking.status === "Pending" && timeDiffInMinutes <= 60
+              ? `<button class="btn btn-success me-2" onclick="startTrip(${
+                  booking.booking_id
+                }, ${booking.vehicle_id}, '${startDate.toLocaleString("en-US", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}', '${endDate.toLocaleString("en-US", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}', '${booking.location}', ${booking.charge_level}, '${
+                  booking.cleanliness_status
+                }', ${
+                  booking.rental_price_per_hour
+                }, ${durationInHours}, ${totalPrice})">
+                <i class="fas fa-play"></i> Start Trip
+              </button>`
+              : booking.status === "Active"
+              ? `<button class="btn btn-primary me-2" onclick="viewTripDetails(
+                  ${booking.booking_id}, 
+                  '${booking.vehicle_id}', 
+                  '${startDate.toLocaleString("en-US", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}', 
+                  '${endDate.toLocaleString("en-US", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}', 
+                  '${booking.location}', 
+                  ${booking.charge_level}, 
+                  '${booking.cleanliness_status}', 
+                  ${booking.rental_price_per_hour}, 
+                  ${durationInHours}, 
+                  ${totalPrice}
+                )">
+                <i class="fas fa-info-circle"></i> Trip Details
+              </button>`
+              : ""
+          }
+          <button class="btn btn-warning me-2" onclick="openModifyModal(${
+            booking.booking_id
+          }, '${booking.booking_date}', '${booking.return_date}', ${
               booking.rental_price_per_hour
             }, '${booking.vehicle_id}')">
-                    <i class="fas fa-edit"></i> Modify
-                  </button>
-                  <button class="btn btn-danger" onclick="cancelBooking(${
-                    booking.booking_id
-                  })">
-                    <i class="fas fa-trash-alt"></i> Cancel
-                  </button>
-                </div>
-              </div>
-            </div>`;
+            <i class="fas fa-edit"></i> Modify
+          </button>
+          <button class="btn btn-danger" onclick="cancelBooking(${
+            booking.booking_id
+          })">
+            <i class="fas fa-trash-alt"></i> Cancel
+          </button>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="google-map" style="height:100%">
+          <iframe
+            width="100%"
+            height="100%"
+            frameborder="0"
+            style="border:0"
+            src="https://www.google.com/maps?q=${encodeURIComponent(
+              booking.location
+            )}&output=embed"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
             activeBookingList.innerHTML += bookingCard;
           });
         }

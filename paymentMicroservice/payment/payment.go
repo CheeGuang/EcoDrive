@@ -12,8 +12,13 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/jung-kurt/gofpdf"
@@ -389,9 +394,79 @@ func generateInvoiceAndSendEmail(bookingID int, paymentID int, userID int, total
         </html>
     `, bookingID, paymentID, totalPrice)
 
-    // Send the email with the invoice attached
-    fileName := fmt.Sprintf("Invoice_%d.pdf", paymentID)
-    return sendEmailWithAttachment(userEmail, subject, body, fileName, fileBytes)
+	// Send the email with the invoice attached
+	fileName := fmt.Sprintf("Invoice_%d.pdf", paymentID)
+	err = sendEmailWithAttachment(userEmail, subject, body, fileName, fileBytes)
+	if err != nil {
+		return err
+	}
+
+	// Get S3 bucket info from environment variables
+	s3BucketARN := os.Getenv("AWS_S3_ARN")
+	s3BookingURI := os.Getenv("AWS_S3_BOOKING_URI")
+	if s3BucketARN == "" || s3BookingURI == "" {
+		return fmt.Errorf("AWS S3 bucket configuration is missing")
+	}
+
+	// Ensure the S3 URI is properly formatted (removing `s3://` if present)
+	bucketName := extractBucketNameFromARN(s3BucketARN)
+	key := fmt.Sprintf("%sinvoice_%d.pdf", sanitizeS3URI(s3BookingURI), paymentID)
+
+	err = storeInvoiceInS3(bucketName, key, fileBytes)
+	if err != nil {
+		return fmt.Errorf("failed to store invoice in S3: %v", err)
+	}
+
+	return nil
+}
+
+// sanitizeS3URI ensures that the S3 URI does not include "s3://"
+func sanitizeS3URI(uri string) string {
+	return strings.TrimPrefix(uri, "s3://cnad-ecodrive/")
+}
+
+// extractBucketNameFromARN extracts the bucket name from an S3 ARN
+func extractBucketNameFromARN(arn string) string {
+	// Assuming the ARN format is arn:aws:s3:::bucket-name
+	parts := strings.Split(arn, ":::")
+	if len(parts) == 2 {
+		return parts[1]
+	}
+	return ""
+}
+
+// storeInvoiceInS3 uploads the invoice file to the specified S3 bucket
+func storeInvoiceInS3(bucketName, key string, fileBytes []byte) error {
+	// Load credentials from environment variables
+	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
+	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	region := "ap-southeast-1" // Adjust as per your AWS region
+
+	// Create a new AWS session
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String(region),
+		Credentials: credentials.NewStaticCredentials(accessKey, secretKey, ""),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create AWS session: %v", err)
+	}
+
+	// Create an S3 service client
+	svc := s3.New(sess)
+
+	// Upload the file
+	_, err = svc.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(key),
+		Body:   bytes.NewReader(fileBytes),
+		ACL:    aws.String("private"), // Ensure the file is private
+	})
+	if err != nil {
+		return fmt.Errorf("failed to upload file to S3: %v", err)
+	}
+
+	fmt.Printf("Invoice successfully uploaded to S3: s3://%s/%s\n", bucketName, key)
+	return nil
 }
 
 // encodeToBase64 encodes bytes to a base64 string
@@ -591,7 +666,28 @@ func generateMembershipInvoiceAndSendEmail(paymentID int, userID int, membership
 
 	// Send the email with the invoice attached
 	fileName := fmt.Sprintf("Membership_Invoice_%d.pdf", paymentID)
-	return sendEmailWithAttachment(userEmail, subject, body, fileName, fileBytes)
+	err = sendEmailWithAttachment(userEmail, subject, body, fileName, fileBytes)
+	if err != nil {
+		return fmt.Errorf("failed to send email: %v", err)
+	}
+
+	// Get S3 bucket info from environment variables
+	s3BucketARN := os.Getenv("AWS_S3_ARN")
+	s3MembershipURI := os.Getenv("AWS_S3_MEMBERSHIP_URI")
+	if s3BucketARN == "" || s3MembershipURI == "" {
+		return fmt.Errorf("AWS S3 bucket configuration is missing")
+	}
+
+	// Ensure the S3 URI is properly formatted (removing `s3://` if present)
+	bucketName := extractBucketNameFromARN(s3BucketARN)
+	key := fmt.Sprintf("%smembership_invoice_%d.pdf", sanitizeS3URI(s3MembershipURI), paymentID)
+
+	err = storeInvoiceInS3(bucketName, key, fileBytes)
+	if err != nil {
+		return fmt.Errorf("failed to store membership invoice in S3: %v", err)
+	}
+
+	return nil
 }
 
 func generateMembershipInvoice(paymentID int, userID int, membershipLevel string, amount float64, paymentMethod string, startDate, endDate time.Time) ([]byte, error) {
