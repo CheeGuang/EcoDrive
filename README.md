@@ -8,8 +8,6 @@ Lee Guang Le, Jeffrey (S10258143A)
 
 In the era of sustainable transportation, EcoDrive revolutionises urban mobility with a user-centric electric car-sharing platform. Designed for scalability and practicality, it features user membership tiers, promotional discounts, and precise billing. The architecture, as outlined in the diagram, ensures robust and efficient operations.
 
----
-
 ## Architecture Diagram
 
 ![Architecture Diagram](./frontend/img/CNAD-Assg1-S10258143A-ArchitectureDiagram.png)
@@ -43,8 +41,6 @@ EcoDrive utilises a **microservices architecture** to ensure modularity, scalabi
    - **Integration**:
      - **Amazon S3**: Stores invoice PDFs for administrative purposes, enabling the admin to view all invoices.
      - **Gmail SMTP**: Sends refund confirmations and invoices to users.
-
----
 
 ### Technology Breakdown
 
@@ -131,8 +127,6 @@ EcoDrive utilises a **microservices architecture** to ensure modularity, scalabi
     </tbody>
   </table>
 </div>
-
----
 
 ## Installation Guide
 
