@@ -1,10 +1,26 @@
 # EcoDrive Architecture Documentation
 
-## Owner
+## Installation Guide
 
-Lee Guang Le, Jeffrey (S10258143A)
+1. **Download Source Code**  
+   Download the source code as a ZIP file from the provided repository link.
 
-## Introduction
+2. **Extract and Open**  
+   Extract the ZIP file and open the project in your preferred Integrated Development Environment (IDE).
+
+3. **Contact for Environment Files**  
+   Reach out to Jeffrey via Telegram at [@cheeguang](https://t.me/cheeguang) to obtain the required environment files.
+
+4. **Place Environment Files**  
+   Place the environment files in their respective directories as instructed.
+
+5. **Start Docker Desktop**  
+   Ensure Docker Desktop is installed and running on your machine.
+
+6. **Access the Application**  
+   Open your browser and navigate to [http://127.0.0.1:8080/index.html](http://127.0.0.1:8080/index.html) to access the application.
+
+## Overview
 
 In the era of sustainable transportation, EcoDrive revolutionises urban mobility with a user-centric electric car-sharing platform. Designed for scalability and practicality, it features user membership tiers, promotional discounts, and precise billing. The architecture, as outlined in the diagram, ensures robust and efficient operations.
 
@@ -128,22 +144,6 @@ EcoDrive utilises a **microservices architecture** to ensure modularity, scalabi
   </table>
 </div>
 
-## Installation Guide
+## Owner
 
-1. **Download Source Code**  
-   Download the source code as a ZIP file from the provided repository link.
-
-2. **Extract and Open**  
-   Extract the ZIP file and open the project in your preferred Integrated Development Environment (IDE).
-
-3. **Contact for Environment Files**  
-   Reach out to Jeffrey via Telegram at [@cheeguang](https://t.me/cheeguang) to obtain the required environment files.
-
-4. **Place Environment Files**  
-   Place the environment files in their respective directories as instructed.
-
-5. **Start Docker Desktop**  
-   Ensure Docker Desktop is installed and running on your machine.
-
-6. **Access the Application**  
-   Open your browser and navigate to [http://127.0.0.1:8080/index.html](http://127.0.0.1:8080/index.html) to access the application.
+Lee Guang Le, Jeffrey (S10258143A)
