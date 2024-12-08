@@ -856,7 +856,7 @@ Marks a booking as completed and updates the associated vehicle details.
 - **400 Bad Request**: Missing or invalid input.
 - **500 Internal Server Error**: Database error.
 
-### Payment Microservice
+## Payment Microservice
 
 ### Base URL
 
