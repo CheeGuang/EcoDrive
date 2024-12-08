@@ -29,42 +29,9 @@ In the era of sustainable transportation, EcoDrive revolutionises urban mobility
 
 ![Architecture Diagram](./frontend/img/CNAD-Assg1-S10258143A-ArchitectureDiagram.png)
 
-# Functional Requirements and Architectural Rationale
+# **Architectural Rationale**
 
-## **Functional Requirements**
-
-### **3.1. User Management**
-
-- **3.1.1. User Registration and Authentication**  
-  Implement user registration with email or phone verification. Secure authentication must include password encryption.
-- **3.1.2. Membership Tiers**  
-  Develop multiple membership levels (e.g., Basic, Premium, VIP) with benefits such as reduced hourly rates, priority vehicle access, or increased booking limits.
-- **3.1.3. User Profile Management**  
-  Enable users to update personal details, view membership status, and track rental history.
-
-### **3.2. Vehicle Reservation System**
-
-- **3.2.1. Car Availability and Booking**  
-  Allow users to view available vehicles in real-time and make reservations for a specified time range.
-- **3.2.2. Booking Modification and Cancellation**  
-  Provide options to modify or cancel reservations within specified policies, with automatic updates to vehicle availability.
-- **3.2.3. (BONUS) Vehicle Status Tracking**  
-  Implement mechanisms to track the location, charge level, and cleanliness of vehicles to ensure readiness for the next rental.
-
-### **3.3. Billing and Payment Processing**
-
-- **3.3.1. Tier-Based Pricing and Discounts**  
-  Calculate billing based on membership level, rental duration, and applicable promotional discounts.
-- **3.3.2. Real-Time Billing Calculation**  
-  Display estimated costs before booking confirmation and provide real-time cost updates during the rental period.
-- **3.3.3. (BONUS) Payment Processing**  
-  Integrate secure payment processing, handle refunds for cancellations, and store payment methods in compliance with industry standards.
-- **3.3.4. Invoicing and Receipts**  
-  Automatically generate detailed invoices after each rental and send them via email or make them accessible in the user’s profile.
-
-## **Architectural Rationale**
-
-### **Microservices Architecture**
+## **Microservices Architecture**
 
 EcoDrive employs a **microservices architecture** to ensure modularity, scalability, and ease of maintenance. Each microservice is responsible for a specific business functionality, enhancing flexibility and enabling independent scaling.
 
