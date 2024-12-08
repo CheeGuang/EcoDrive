@@ -35,6 +35,9 @@
 7. **Access the Application**  
    Open your browser and navigate to [http://127.0.0.1:8080/index.html](http://127.0.0.1:8080/index.html) to access the application.
 
+8. **Install CORS Extension**  
+   Install the **Moesif Origin & CORS Changer** Chrome extension from the [Chrome Web Store](chrome://extensions/?id=digfbfaphojjndkpccljibejjbppifbc). Enable the extension to handle CORS issues and ensure proper API functionality.
+
 # Overview
 
 In the era of sustainable transportation, EcoDrive revolutionises urban mobility with a user-centric electric car-sharing platform. Designed for scalability and practicality, it features user membership tiers, promotional discounts, and precise billing. The architecture, as outlined in the diagram, ensures robust and efficient operations.
